@@ -32,3 +32,4 @@ GEMINI.md
 
 # generated
 src/generated/contentDatabase.ts
+public/rss/*.xml
