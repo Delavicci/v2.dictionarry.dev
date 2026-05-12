@@ -19,22 +19,6 @@ export const databaseSources: DatabaseSourceDefinition[] = [
     isDefault: true
   },
   {
-    id: 'trash-pcd',
-    name: 'TRaSH PCD',
-    repo: 'https://github.com/Dictionarry-Hub/trash-pcd',
-    branch: 'main',
-    format: 'pcd',
-    type: 'github'
-  },
-  {
-    id: 'dumpstarr',
-    name: 'Dumpstarr',
-    repo: 'https://github.com/Dumpstarr/Database',
-    branch: 'v2',
-    format: 'pcd',
-    type: 'github'
-  },
-  {
     id: 'dictionarry-dev-yaml',
     name: 'Dictionarry Dev YAML',
     repo: 'https://github.com/Dictionarry-Hub/database',
@@ -45,7 +29,7 @@ export const databaseSources: DatabaseSourceDefinition[] = [
 ];
 
 export const databaseSourceGroups: Record<string, string[]> = {
-  v2: ['dictionarry', 'trash-pcd', 'dumpstarr'],
+  v2: ['dictionarry'],
   legacy: ['dictionarry-dev-yaml'],
   all: databaseSources.map(source => source.id)
 };
