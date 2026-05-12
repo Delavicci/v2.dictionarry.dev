@@ -33,14 +33,6 @@ export class StaticPageProcessor extends ContentProcessor {
         tags: ['profilarr', 'setup', 'configuration']
       },
       {
-        id: 'getting-started-development',
-        path: '/development',
-        title: 'Development',
-        description: 'Development guide and contribution instructions',
-        category: 'getting-started',
-        tags: ['development', 'contributing']
-      },
-      {
         id: 'quality-profile-index',
         path: '/quality-profile',
         title: 'Quality Profiles',

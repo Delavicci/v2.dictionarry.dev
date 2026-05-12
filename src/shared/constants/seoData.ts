@@ -25,30 +25,6 @@ const seoData: Record<string, SeoData> = {
     title: 'Profilarr 101',
     description: 'An overview of the core Link, Bridge, and Sync workflow.',
   },
-  '/profilarr-setup/linking': {
-    title: 'Linking',
-    description: 'Connect Profilarr to a configuration database on GitHub.',
-  },
-  '/profilarr-setup/bridging': {
-    title: 'Bridging',
-    description: 'Connect Profilarr to your Radarr and Sonarr instances.',
-  },
-  '/profilarr-setup/syncing': {
-    title: 'Syncing',
-    description: 'An overview of the manual, on-pull, and scheduled sync methods.',
-  },
-  '/profilarr-setup/updates': {
-    title: 'Updates',
-    description: 'Learn how Profilarr manages updates from database maintainers.',
-  },
-  '/profilarr-setup/customizations': {
-    title: 'Customizations',
-    description: 'Make local changes to configurations while staying connected to updates.',
-  },
-  '/profilarr-setup/development': {
-    title: 'Development',
-    description: 'A guide for developers on contributing to a Profilarr Database.',
-  },
   '/quality-profile': {
     title: 'Quality Profiles',
     description: 'Browse and discover Quality Profiles for your media server.',

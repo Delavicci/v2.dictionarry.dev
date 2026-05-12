@@ -93,6 +93,5 @@
 
   <PageNavigation 
     previous={{path: '/profilarr-setup/installation', title: 'Installation', description: 'Docker setup guide'}}
-    next={{path: '/profilarr-setup/linking', title: 'Linking', description: 'Connect to configuration sources in detail'}}
   />
 </div>

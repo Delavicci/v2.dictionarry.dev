@@ -8,13 +8,7 @@
   import HeaderNav from './navigation/headerNav/headerNav.svelte'
   import Welcome from './gettingStarted/welcome.svelte'
   import ProfilarrInstallation from './gettingStarted/profilarrInstallation.svelte'
-  import Development from './gettingStarted/development.svelte'
   import Profilarr101 from './gettingStarted/101.svelte'
-  import Linking from './gettingStarted/linking.svelte'
-  import Bridging from './gettingStarted/bridging.svelte'
-  import Sync from './gettingStarted/syncing.svelte'
-  import Updates from './gettingStarted/updates.svelte'
-  import Customizations from './gettingStarted/customizations.svelte'
   import DevlogsLanding from './devlogs/landing/page.svelte'
   import DevlogsSlug from './devlogs/slug/page.svelte'
   import QualityProfilePage from './qualityProfile/landing/page.svelte'
@@ -42,12 +36,6 @@
     '/welcome': Welcome,
     '/profilarr-setup/installation': ProfilarrInstallation,
     '/profilarr-setup/101': Profilarr101,
-    '/profilarr-setup/linking': Linking,
-    '/profilarr-setup/bridging': Bridging,
-    '/profilarr-setup/syncing': Sync,
-    '/profilarr-setup/updates': Updates,
-    '/profilarr-setup/customizations': Customizations,
-    '/profilarr-setup/development': Development,
     '/devlogs': DevlogsLanding,
     '/quality-profile': QualityProfilePage,
     '/custom-format': CustomFormatPage,
