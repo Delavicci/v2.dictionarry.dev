@@ -3,6 +3,7 @@
   import { Route, router } from 'tinro'
   import Navbar from './navigation/navbar/navbar.svelte'
   import Footer from './footer/footer.svelte'
+  import V1DocsBanner from './shared/ui/v1DocsBanner.svelte'
   import PageNav from './navigation/pageNav/pageNav.svelte'
   import HeaderNav from './navigation/headerNav/headerNav.svelte'
   import Welcome from './gettingStarted/welcome.svelte'
@@ -34,7 +35,7 @@
   import { onMount } from 'svelte'
   import { isMobileSidebarOpen, closeMobileSidebar, isMobileHeaderNavOpen, closeMobileHeaderNav } from '@shared/stores/mobileNavigation'
   import { fly } from 'svelte/transition'
-  
+
   // Route configuration - single source of truth for all routes
   const routeConfig = {
     '/': Welcome,
@@ -160,6 +161,7 @@
 
 <div class="h-screen flex flex-col">
   <Navbar />
+  <V1DocsBanner />
   <div class="flex flex-1 relative overflow-hidden">
     <!-- Desktop sidebar -->
     <div class="hidden xl:block">
