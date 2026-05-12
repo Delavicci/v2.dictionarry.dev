@@ -6,12 +6,11 @@
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
   import FeaturedCard from './featured/featuredCard.svelte';
   import DevlogsList from './list/list.svelte';
-  import { contentDatabase } from '@db';
+  import { getGlobalEntriesByCategory } from '@shared/utils/contentDatabase';
 
   const seo = getSeoData($router.path);
 
-  const devlogEntries = contentDatabase.entries
-    .filter(entry => entry.category === 'devlogs')
+  const devlogEntries = getGlobalEntriesByCategory('devlogs')
     .sort((a, b) => {
       const dateA = new Date(a.frontmatter?.created || 0);
       const dateB = new Date(b.frontmatter?.created || 0);

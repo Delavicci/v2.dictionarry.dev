@@ -52,7 +52,7 @@
             >
               <td class="p-0">
                 <a
-                  href="/custom-format/{getFormatSlug(format)}"
+                  href={format.path || `/custom-format/${getFormatSlug(format)}`}
                   class="block px-4 py-3 text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:underline transition-colors font-medium"
                 >
                   {format.name}
@@ -60,7 +60,7 @@
               </td>
               <td class="px-4 py-3">
                 <a
-                  href="/custom-format/{getFormatSlug(format)}"
+                  href={format.path || `/custom-format/${getFormatSlug(format)}`}
                   class="block text-sm text-neutral-600 dark:text-neutral-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
                 >
                   {format.description || "No description available"}

@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { ContentEntry, RawContent, ProcessorConfig, ContentProcessor } from '../core/types';
 import { DataSource } from '../core/DataSource';
+import { createNamespacedEntryId } from '../core/databaseSource';
 import { slugify, sanitizeForSearch } from '../utils/text';
 
 export class MediaManagementProcessor extends ContentProcessor {
@@ -48,7 +49,9 @@ export class MediaManagementProcessor extends ContentProcessor {
       const tags = [...(data.tags || []), 'media-management', slug];
       
       return {
-        id: `media-management-${slug}`,
+        id: createNamespacedEntryId(config.database?.id, 'media-management', slug),
+        databaseId: config.database?.id,
+        sourceEntityId: data.name || slug,
         path: `/media-management/${slug}`,
         type: 'media-management',
         slug,
@@ -68,7 +71,7 @@ export class MediaManagementProcessor extends ContentProcessor {
     }
   }
 
-  async processAll(source: DataSource): Promise<ContentEntry[]> {
+  async processAll(source: DataSource, config: ProcessorConfig): Promise<ContentEntry[]> {
     const entries: ContentEntry[] = [];
     const files = await source.listFiles('media_management', /\.ya?ml$/);
     
@@ -78,7 +81,7 @@ export class MediaManagementProcessor extends ContentProcessor {
     for (const file of files) {
       const content = await source.readFile(file);
       if (content) {
-        const entry = await this.process(content, {} as ProcessorConfig);
+        const entry = await this.process(content, config);
         if (entry) {
           // Add commit log if available
           const commitLog = commitLogs.get(file);

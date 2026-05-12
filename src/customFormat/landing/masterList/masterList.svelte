@@ -1,14 +1,16 @@
 <script>
-  import { contentDatabase } from "@db";
   import Group from "./group.svelte";
+  import { getEntriesByType, getEntryPath } from "@shared/utils/contentDatabase";
   import { Volume2, Monitor, Users, Tv, Code, HardDrive, Tag, Square, Layers, Folder } from "lucide-svelte";
 
+  export let databaseId = undefined;
+
   // Get all custom formats from the database
-  $: allFormats = contentDatabase.entries
-    .filter((entry) => entry.type === "custom-format")
+  $: allFormats = getEntriesByType("custom-format", databaseId)
     .map((entry) => ({
       name: entry.data?.name || entry.title,
       slug: entry.slug,
+      path: getEntryPath(entry, databaseId),
       tags: entry.data?.tags || [],
       description: entry.data?.description || "",
     }))

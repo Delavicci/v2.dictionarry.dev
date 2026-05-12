@@ -30,6 +30,7 @@ function generateSitemap() {
     '/quality-profile?section=profile-wizard',  // Give wizard high priority
     '/custom-format',
     '/regex-pattern',
+    '/delay-profile',
     '/wiki',
     '/media-management'
   ]);
@@ -48,7 +49,7 @@ function generateSitemap() {
     } else if (route === '/profilarr-setup/installation') {
       priority = '0.9';
       changefreq = 'monthly';  // Important but stable
-    } else if (route === '/quality-profile' || route === '/custom-format' || route === '/regex-pattern') {
+    } else if (route === '/quality-profile' || route === '/custom-format' || route === '/regex-pattern' || route === '/delay-profile') {
       priority = '0.8';
       changefreq = 'weekly';  // Landing pages update when DB updates
     } else if (priorityRoutes.has(route)) {

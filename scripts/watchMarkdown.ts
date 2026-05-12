@@ -77,7 +77,10 @@ async function rebuildMarkdownEntries(existingDatabase: ContentDatabase): Promis
 
     // Rebuild database
     const databaseBuilder = new DatabaseBuilder();
-    const database = databaseBuilder.build(allEntries);
+    const database = databaseBuilder.build(allEntries, {
+      databases: existingDatabase.databases,
+      defaultDatabaseId: existingDatabase.defaultDatabaseId
+    });
 
     // Preserve metadata from existing database, update timestamp
     database.metadata = {

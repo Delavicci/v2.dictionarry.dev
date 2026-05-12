@@ -112,7 +112,7 @@
 
 <div class="max-w-4xl">
   <section class="mb-10">
-    <h1 class="header-font mb-6 max-w-3xl text-3xl font-semibold leading-tight text-neutral-950 dark:text-white md:text-4xl">
+    <h1 class="header-font mb-6 max-w-3xl text-2xl font-semibold leading-tight text-neutral-950 dark:text-white md:text-3xl">
       Less config wrestling, more watching things.
     </h1>
     <div class="space-y-4 text-base leading-7 text-neutral-700 dark:text-neutral-300">
@@ -138,7 +138,7 @@
     </div>
   </section>
 
-  <section id="before-you-start" class="mb-10 rounded-r-lg border border-neutral-200 border-l-4 border-l-amber-500 bg-neutral-50 p-4 dark:border-neutral-700 dark:border-l-amber-500 dark:bg-neutral-900/60">
+  <section id="before-you-start" class="mb-10 rounded-r-lg border-l-4 border-l-amber-500 bg-neutral-50 p-4 dark:border-l-amber-500 dark:bg-neutral-900/60">
     <div class="mb-2 flex items-center gap-2">
       <span>⚠️</span>
       <h2 class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">Before You Start</h2>

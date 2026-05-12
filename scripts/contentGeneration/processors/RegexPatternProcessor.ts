@@ -4,6 +4,7 @@ import * as yaml from 'js-yaml';
 import { execSync } from 'child_process';
 import { ContentEntry, RawContent, ProcessorConfig, ContentProcessor } from '../core/types';
 import { DataSource } from '../core/DataSource';
+import { createNamespacedEntryId } from '../core/databaseSource';
 import { slugify, sanitizeForSearch } from '../utils/text';
 import { Regex101Cache } from '../utils/regex101Cache';
 import { TestResultsCache } from '../utils/testResultsCache';
@@ -82,7 +83,9 @@ export class RegexPatternProcessor extends ContentProcessor {
       }
       
       return {
-        id: `regex-pattern-${slug}`,
+        id: createNamespacedEntryId(config.database?.id, 'regex-pattern', slug),
+        databaseId: config.database?.id,
+        sourceEntityId: data.name || slug,
         path: `/regex-pattern/${slug}`,
         type: 'regex-pattern',
         slug,
@@ -200,7 +203,7 @@ export class RegexPatternProcessor extends ContentProcessor {
     return testResults;
   }
 
-  async processAll(source: DataSource): Promise<ContentEntry[]> {
+  async processAll(source: DataSource, config: ProcessorConfig): Promise<ContentEntry[]> {
     const files = await source.listFiles('regex_patterns', /\.ya?ml$/);
     console.log(`  📂 Processing ${files.length} regex patterns...`);
     
@@ -252,7 +255,7 @@ export class RegexPatternProcessor extends ContentProcessor {
       const willUseCachedTests = regex101Url && regex101Data.get(regex101Url)?.unitTests && 
         this.testResultsCache.getCachedResults(data.pattern || regex101Data.get(regex101Url).regex, regex101Data.get(regex101Url).unitTests);
       
-      const entry = await this.processWithCachedData(content, data, regex101Url ? regex101Data.get(regex101Url) : null);
+      const entry = await this.processWithCachedData(content, data, regex101Url ? regex101Data.get(regex101Url) : null, config);
       if (entry) {
         // Add commit log if available
         const commitLog = commitLogs.get(file);
@@ -281,7 +284,7 @@ export class RegexPatternProcessor extends ContentProcessor {
     return entries;
   }
   
-  private async processWithCachedData(content: RawContent, data: any, regex101Data: any): Promise<ContentEntry | null> {
+  private async processWithCachedData(content: RawContent, data: any, regex101Data: any, config: ProcessorConfig): Promise<ContentEntry | null> {
     try {
       const filename = path.basename(content.path);
       const slug = slugify(filename.replace(/\.ya?ml$/, ''));
@@ -310,7 +313,9 @@ export class RegexPatternProcessor extends ContentProcessor {
       }
       
       return {
-        id: `regex-pattern-${slug}`,
+        id: createNamespacedEntryId(config.database?.id, 'regex-pattern', slug),
+        databaseId: config.database?.id,
+        sourceEntityId: data.name || slug,
         path: `/regex-pattern/${slug}`,
         type: 'regex-pattern',
         slug,
@@ -338,6 +343,7 @@ export class RegexPatternProcessor extends ContentProcessor {
     const patternReferences = new Map<string, Array<{
       title: string; 
       slug: string;
+      databaseId?: string;
       description?: string;
       tags?: string[];
       conditionCount?: number;
@@ -347,10 +353,11 @@ export class RegexPatternProcessor extends ContentProcessor {
       if (format.data?.conditions) {
         for (const condition of format.data.conditions) {
           // Check if this condition references a regex pattern
-          if (condition.type === 'release_group' && condition.pattern) {
+          if (['release_title', 'release_group', 'edition'].includes(condition.type) && condition.pattern) {
             // Find the regex pattern entry that matches this pattern name
             const patternEntry = entries.find(e => 
               e.type === 'regex-pattern' && 
+              e.databaseId === format.databaseId &&
               (e.data?.name === condition.pattern || e.title === condition.pattern)
             );
             
@@ -361,6 +368,7 @@ export class RegexPatternProcessor extends ContentProcessor {
               patternReferences.get(patternEntry.id)!.push({
                 title: format.title,
                 slug: format.slug,
+                databaseId: format.databaseId,
                 description: format.description,
                 tags: format.data?.tags,
                 conditionCount: format.data?.conditions?.length

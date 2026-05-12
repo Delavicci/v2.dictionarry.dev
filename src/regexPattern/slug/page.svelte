@@ -1,10 +1,10 @@
 <script>
   import Seo from '@shared/ui/seo.svelte';
   import { router } from 'tinro';
-  import { contentDatabase } from '@db';
   import { getSeoData } from '@shared/constants/seoData';
+  import { findEntryByTypeAndSlug, getCurrentDatabaseIdFromPath, getEntrySlugFromPath } from '@shared/utils/contentDatabase';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
   import Overview from './overview/overview.svelte';
   import Pattern from './pattern/pattern.svelte';
   import Tests from './tests/tests.svelte';
@@ -16,13 +16,12 @@
   
   // Get current path and extract slug
   $: currentPath = $router.path;
-  $: slug = currentPath.replace('/regex-pattern/', '').replace(/\/$/, '');
+  $: databaseId = getCurrentDatabaseIdFromPath(currentPath);
+  $: slug = getEntrySlugFromPath(currentPath, 'regex-pattern');
   
   // Find regex pattern in content database
   $: regexEntry = slug && slug !== 'regex-pattern' 
-    ? contentDatabase.entries.find(entry => 
-        entry.type === 'regex-pattern' && entry.slug === slug
-      )
+    ? findEntryByTypeAndSlug('regex-pattern', slug, databaseId)
     : null;
   
   // Extract all data directly without nesting
@@ -41,18 +40,16 @@
     description: getSeoData('/regex-pattern').description
   };
   
-  // Debug: Log what data we're getting
-  $: if (referencedBy.length > 0) {
-    console.log('Referenced by data:', referencedBy);
-  }
-  
   // Set up navigation when regex pattern is loaded
   $: if (regexEntry) {
     const navItems = ['Overview', 'Pattern', 'Tests'];
     if (referencedBy.length > 0) {
       navItems.push('Referenced By');
     }
-    navItems.push('Changelog', 'Discussion');
+    if (commitLog) {
+      navItems.push('Changelog');
+    }
+    navItems.push('Discussion');
     setNavigationItems(navItems, currentPath);
   }
   
@@ -95,9 +92,11 @@
       {/if}
       
       <!-- Changelog Section -->
-      <section id="changelog" class="mb-12">
-        <Changelog {commitLog} />
-      </section>
+      {#if commitLog}
+        <section id="changelog" class="mb-12">
+          <Changelog {commitLog} />
+        </section>
+      {/if}
       
       <!-- Discussion Section -->
       {#if name}

@@ -3,7 +3,9 @@
 import { parseArgs } from 'util';
 import { DataSource } from './contentGeneration/core/DataSource';
 import { DatabaseBuilder } from './contentGeneration/core/DatabaseBuilder';
-import { DataSourceConfig, ContentEntry } from './contentGeneration/core/types';
+import { DataSourceConfig, ContentEntry, DatabaseFormat, ProcessorConfig } from './contentGeneration/core/types';
+import { createGeneratedDatabaseSource } from './contentGeneration/core/databaseSource';
+import { databaseSources, getDatabaseSource, getDatabaseSourceGroup } from './contentGeneration/config/databaseSources';
 
 // Import all processors
 import { RegexPatternProcessor } from './contentGeneration/processors/RegexPatternProcessor';
@@ -13,17 +15,25 @@ import { MediaManagementProcessor } from './contentGeneration/processors/MediaMa
 import { MarkdownProcessor } from './contentGeneration/processors/MarkdownProcessor';
 import { StaticPageProcessor } from './contentGeneration/processors/StaticPageProcessor';
 import { RssGenerator } from './contentGeneration/core/RssGenerator';
+import { PcdProcessor } from './contentGeneration/pcd/PcdProcessor';
 
 interface CliOptions {
   repo?: string;
   branch?: string;
+  localPath?: string;
+  source?: string;
+  sourceGroup?: string;
+  allSources?: boolean;
+  databaseId?: string;
+  databaseName?: string;
+  format?: DatabaseFormat;
   token?: string;
   output?: string;
   cache?: boolean;
   cacheDir?: string;
   verbose?: boolean;
   debug?: boolean;
-  only?: string[];
+  only?: string;
   help?: boolean;
 }
 
@@ -36,6 +46,13 @@ Usage: npm run generate:content -- [options]
 Options:
   --repo <url>      GitHub repository URL to fetch content from
   --branch <name>   Branch to use (default: main)
+  --local-path <path> Local database path for direct local generation
+  --source <id>     Generate from an allowlisted database source
+  --source-group <id> Generate from an allowlisted source group
+  --all-sources     Generate from all allowlisted sources
+  --database-id <id> Stable generated database ID (default: dictionarry)
+  --database-name <name> Human-readable generated database name
+  --format <format> Source format: yaml or pcd (default: yaml)
   --token <token>   GitHub token for private repositories
   --output <path>   Output path for generated database (default: ./src/generated/contentDatabase.ts)
   --cache           Cache repository for faster subsequent runs
@@ -53,12 +70,132 @@ Examples:
   # Generate from GitHub repository
   npm run generate:content -- --repo https://github.com/user/repo --branch main
 
+  # Generate from an allowlisted source
+  npm run generate:content -- --source dictionarry-dev-yaml
+
   # Generate only specific types with caching
   npm run generate:content -- --repo https://github.com/user/repo --cache --only regex,custom-formats
 
   # Use with private repository
   npm run generate:content -- --repo https://github.com/user/private-repo --token ghp_xxxx
 `);
+}
+
+function createProcessors() {
+  return [
+    new RegexPatternProcessor(),
+    new CustomFormatProcessor(),
+    new QualityProfileProcessor(),
+    new MediaManagementProcessor(),
+    new MarkdownProcessor(),
+    new StaticPageProcessor()
+  ];
+}
+
+function filterProcessors(processors: ReturnType<typeof createProcessors>, only?: string[]) {
+  if (!only || only.length === 0) {
+    return processors;
+  }
+
+  const typeMap: Record<string, string> = {
+    'regex': 'regex-pattern',
+    'custom-formats': 'custom-format',
+    'quality-profiles': 'quality-profile',
+    'media-management': 'media-management',
+    'markdown': 'markdown',
+    'static': 'static'
+  };
+
+  const processorNames = only.map(t => typeMap[t] || t);
+  return processors.filter(p => processorNames.includes(p.name));
+}
+
+function getOnlyTypes(options: CliOptions): string[] | undefined {
+  return options.only ? options.only.split(',').map(t => t.trim().toLowerCase()) : undefined;
+}
+
+function getOnlyContentTypes(onlyTypes?: string[]): Set<string> | null {
+  if (!onlyTypes) {
+    return null;
+  }
+
+  const typeMap: Record<string, string> = {
+    'regex': 'regex-pattern',
+    'custom-formats': 'custom-format',
+    'quality-profiles': 'quality-profile',
+    'media-management': 'media-management',
+    'delay-profiles': 'delay-profile',
+    'markdown': 'markdown',
+    'static': 'static'
+  };
+
+  return new Set(onlyTypes.map(type => typeMap[type] || type));
+}
+
+function resolveSourceConfigs(options: CliOptions): DataSourceConfig[] {
+  const withCliOptions = (source: DataSourceConfig): DataSourceConfig => ({
+    ...source,
+    token: options.token || source.token,
+    cache: options.cache ?? source.cache,
+    cacheDir: options.cacheDir
+      ? `${options.cacheDir}/${source.id || source.repo || 'source'}`
+      : source.cacheDir
+  });
+
+  if (options.allSources) {
+    return databaseSources.map(withCliOptions);
+  }
+
+  if (options.sourceGroup) {
+    return getDatabaseSourceGroup(options.sourceGroup).map(withCliOptions);
+  }
+
+  if (options.source) {
+    return [withCliOptions(getDatabaseSource(options.source))];
+  }
+
+  const sourceFormat = options.format || 'yaml';
+  if (!['yaml', 'pcd'].includes(sourceFormat)) {
+    throw new Error(`Unsupported source format: ${sourceFormat}`);
+  }
+
+  return [{
+    type: options.repo ? 'github' : 'local',
+    id: options.databaseId,
+    name: options.databaseName,
+    format: sourceFormat,
+    repo: options.repo,
+    branch: options.branch || 'main',
+    token: options.token,
+    localPath: options.localPath || './public/database',
+    cache: options.cache,
+    cacheDir: options.cacheDir || '/tmp/dictionarry-cache'
+  }];
+}
+
+async function logFileCounts(dataSource: DataSource, verbose?: boolean) {
+  if (!verbose) {
+    return;
+  }
+
+  const fileCounts: Record<string, number> = {
+    'regex_patterns': (await dataSource.listFiles('regex_patterns', /\.ya?ml$/)).length,
+    'custom_formats': (await dataSource.listFiles('custom_formats', /\.ya?ml$/)).length,
+    'profiles': (await dataSource.listFiles('profiles', /\.ya?ml$/)).length,
+    'media_management': (await dataSource.listFiles('media_management', /\.ya?ml$/)).length,
+    'wiki': (await dataSource.listFiles('wiki', /\.md$/)).length,
+    'dev_logs': (await dataSource.listFiles('dev_logs', /\.md$/)).length
+  };
+
+  const totalExpectedFiles = Object.values(fileCounts).reduce((sum, count) => sum + count, 0);
+
+  console.log('📂 Repository file counts:');
+  for (const [dir, count] of Object.entries(fileCounts)) {
+    if (count > 0) {
+      console.log(`  • ${dir}: ${count} files`);
+    }
+  }
+  console.log(`  • Total: ${totalExpectedFiles} files`);
 }
 
 async function main() {
@@ -69,6 +206,13 @@ async function main() {
       options: {
         repo: { type: 'string' },
         branch: { type: 'string' },
+        'local-path': { type: 'string' },
+        source: { type: 'string' },
+        'source-group': { type: 'string' },
+        'all-sources': { type: 'boolean' },
+        'database-id': { type: 'string' },
+        'database-name': { type: 'string' },
+        format: { type: 'string' },
         token: { type: 'string' },
         output: { type: 'string' },
         cache: { type: 'boolean' },
@@ -80,8 +224,20 @@ async function main() {
       }
     });
 
-    const options = values as CliOptions & { 'cache-dir'?: string };
+    const options = values as CliOptions & {
+      'cache-dir'?: string;
+      'database-id'?: string;
+      'database-name'?: string;
+      'local-path'?: string;
+      'source-group'?: string;
+      'all-sources'?: boolean;
+    };
     options.cacheDir = options['cache-dir'];
+    options.databaseId = options['database-id'];
+    options.databaseName = options['database-name'];
+    options.localPath = options['local-path'];
+    options.sourceGroup = options['source-group'];
+    options.allSources = options['all-sources'];
 
     if (options.help) {
       showHelp();
@@ -89,101 +245,123 @@ async function main() {
     }
 
     console.log('🔨 Starting content database generation...');
-    
-    // Configure data source
-    const sourceConfig: DataSourceConfig = {
-      type: options.repo ? 'github' : 'local',
-      repo: options.repo,
-      branch: options.branch || 'main',
-      token: options.token,
-      localPath: './public/database',
-      cache: options.cache,
-      cacheDir: options.cacheDir || '/tmp/dictionarry-cache'
-    };
 
-    if (options.verbose) {
-      console.log('📋 Configuration:', sourceConfig);
-    }
-
-    // Initialize data source
-    const dataSource = new DataSource(sourceConfig);
-    await dataSource.initialize();
-
-    // Count files in repository for validation
-    const fileCounts: Record<string, number> = {
-      'regex_patterns': (await dataSource.listFiles('regex_patterns', /\.ya?ml$/)).length,
-      'custom_formats': (await dataSource.listFiles('custom_formats', /\.ya?ml$/)).length,
-      'profiles': (await dataSource.listFiles('profiles', /\.ya?ml$/)).length,
-      'media_management': (await dataSource.listFiles('media_management', /\.ya?ml$/)).length,
-      'wiki': (await dataSource.listFiles('wiki', /\.md$/)).length,
-      'dev_logs': (await dataSource.listFiles('dev_logs', /\.md$/)).length
-    };
-
-    const totalExpectedFiles = Object.values(fileCounts).reduce((sum, count) => sum + count, 0);
-    
-    if (options.verbose) {
-      console.log('📂 Repository file counts:');
-      for (const [dir, count] of Object.entries(fileCounts)) {
-        if (count > 0) {
-          console.log(`  • ${dir}: ${count} files`);
-        }
-      }
-      console.log(`  • Total: ${totalExpectedFiles} files`);
-    }
+    const generatedAt = new Date().toISOString();
+    const outputPath = options.output || './src/generated/contentDatabase.ts';
+    const sourceConfigs = resolveSourceConfigs(options);
 
     // Initialize processors
-    const processors = [
-      new RegexPatternProcessor(),
-      new CustomFormatProcessor(),
-      new QualityProfileProcessor(),
-      new MediaManagementProcessor(),
-      new MarkdownProcessor(),
-      new StaticPageProcessor()
-    ];
+    const processors = createProcessors();
+    const onlyTypes = getOnlyTypes(options);
+    const onlyContentTypes = getOnlyContentTypes(onlyTypes);
 
     // Filter processors if --only is specified
-    let activeProcessors = processors;
-    if (options.only) {
-      const onlyTypes = options.only.split(',').map(t => t.trim().toLowerCase());
-      const typeMap: Record<string, string> = {
-        'regex': 'regex-pattern',
-        'custom-formats': 'custom-format',
-        'quality-profiles': 'quality-profile',
-        'media-management': 'media-management',
-        'markdown': 'markdown',
-        'static': 'static'
-      };
-      
-      const processorNames = onlyTypes.map(t => typeMap[t] || t);
-      activeProcessors = processors.filter(p => processorNames.includes(p.name));
-      
-      console.log(`📦 Processing only: ${activeProcessors.map(p => p.name).join(', ')}`);
+    let activeProcessors = filterProcessors(processors, onlyTypes);
+    if (onlyTypes) {
+      console.log(`📦 Processing only: ${onlyTypes.join(', ')}`);
     }
+
+    const globalProcessorNames = new Set(['markdown', 'static']);
+    const databaseProcessors = activeProcessors.filter(processor => !globalProcessorNames.has(processor.name));
+    const globalProcessors = activeProcessors.filter(processor => globalProcessorNames.has(processor.name));
 
     // Process all content
     const allEntries: ContentEntry[] = [];
     const errors: Array<{ processor: string; error: string }> = [];
+    const databaseSources = sourceConfigs.map(sourceConfig => createGeneratedDatabaseSource(sourceConfig, generatedAt));
 
-    for (const processor of activeProcessors) {
+    for (const [index, sourceConfig] of sourceConfigs.entries()) {
+      const shouldProcessDatabaseSource = sourceConfig.format === 'pcd'
+        ? !onlyContentTypes || [...onlyContentTypes].some(type => !globalProcessorNames.has(type))
+        : databaseProcessors.length > 0;
+
+      if (!shouldProcessDatabaseSource) {
+        continue;
+      }
+
+      if (options.verbose) {
+        console.log('📋 Configuration:', sourceConfig);
+      }
+
+      const dataSource = new DataSource(sourceConfig);
+      await dataSource.initialize();
+
       try {
-        if (options.verbose) {
-          console.log(`  ⚙️  Processing ${processor.name}...`);
+        await logFileCounts(dataSource, options.verbose);
+
+        const databaseSource = databaseSources[index];
+        const processorConfig: ProcessorConfig = {
+          source: sourceConfig,
+          database: databaseSource,
+          outputPath,
+          verbose: options.verbose,
+          debug: options.debug,
+          only: onlyTypes
+        };
+
+        if (sourceConfig.format === 'pcd') {
+          let entries = await new PcdProcessor().processAll(dataSource, databaseSource, sourceConfig);
+          if (onlyContentTypes) {
+            entries = entries.filter(entry => onlyContentTypes.has(entry.type));
+          }
+          allEntries.push(...entries);
+          continue;
         }
 
-        const entries = await processor.processAll(dataSource);
-        allEntries.push(...entries);
+        for (const processor of databaseProcessors) {
+          try {
+            if (options.verbose) {
+              console.log(`  ⚙️  Processing ${processor.name}...`);
+            }
 
-        if (options.debug) {
-          console.log(`    ✓ Found ${entries.length} ${processor.name} entries`);
+            const entries = await processor.processAll(dataSource, processorConfig);
+            allEntries.push(...entries);
+
+            if (options.debug) {
+              console.log(`    ✓ Found ${entries.length} ${processor.name} entries`);
+            }
+          } catch (error: any) {
+            const errorMsg = `Failed to process ${processor.name}: ${error.message}`;
+            console.error(`    ✗ ${errorMsg}`);
+            errors.push({ processor: processor.name, error: error.message });
+
+            if (options.debug) {
+              console.error(error.stack);
+            }
+          }
         }
-      } catch (error: any) {
-        const errorMsg = `Failed to process ${processor.name}: ${error.message}`;
-        console.error(`    ✗ ${errorMsg}`);
-        errors.push({ processor: processor.name, error: error.message });
-        
-        if (options.debug) {
-          console.error(error.stack);
+      } finally {
+        await dataSource.cleanup();
+      }
+    }
+
+    if (globalProcessors.length > 0) {
+      const globalSourceConfig: DataSourceConfig = {
+        type: 'local',
+        localPath: './public'
+      };
+      const globalDataSource = new DataSource(globalSourceConfig);
+      await globalDataSource.initialize();
+
+      try {
+        for (const processor of globalProcessors) {
+          try {
+            const entries = await processor.processAll(globalDataSource, {
+              source: globalSourceConfig,
+              outputPath,
+              verbose: options.verbose,
+              debug: options.debug,
+              only: onlyTypes
+            });
+            allEntries.push(...entries);
+          } catch (error: any) {
+            const errorMsg = `Failed to process ${processor.name}: ${error.message}`;
+            console.error(`    ✗ ${errorMsg}`);
+            errors.push({ processor: processor.name, error: error.message });
+          }
         }
+      } finally {
+        await globalDataSource.cleanup();
       }
     }
 
@@ -203,18 +381,20 @@ async function main() {
     // Build database
     console.log('🏗️  Building database...');
     const databaseBuilder = new DatabaseBuilder();
-    const database = databaseBuilder.build(allEntries);
+    const database = databaseBuilder.build(allEntries, {
+      databases: databaseSources,
+      defaultDatabaseId: databaseSources.find(source => source.isDefault)?.id || databaseSources[0]?.id
+    });
     
     // Add metadata
     database.metadata = {
-      source: sourceConfig.repo || 'local',
-      branch: sourceConfig.branch || 'main',
-      timestamp: new Date().toISOString(),
+      source: databaseSources.map(source => source.repo).join(', '),
+      branch: databaseSources.map(source => source.branch).join(', '),
+      timestamp: generatedAt,
       entriesCount: allEntries.length
     };
 
     // Write output
-    const outputPath = options.output || './src/generated/contentDatabase.ts';
     console.log(`💾 Writing database to ${outputPath}...`);
     await databaseBuilder.write(database, outputPath);
 
@@ -244,10 +424,6 @@ async function main() {
         console.log(`  • ${error.processor}: ${error.error}`);
       }
     }
-
-    // Cleanup
-    await dataSource.cleanup();
-
   } catch (error: any) {
     console.error('❌ Fatal error:', error.message);
     if (process.argv.includes('--debug')) {

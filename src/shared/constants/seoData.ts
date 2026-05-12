@@ -19,7 +19,7 @@ const seoData: Record<string, SeoData> = {
   },
   '/profilarr-setup/installation': {
     title: 'Installation',
-    description: 'A guide to installing Profilarr via Docker, Unraid, or CasaOS.',
+    description: 'A guide to installing Profilarr with Docker or Unraid.',
   },
   '/quality-profile': {
     title: 'Quality Profiles',
@@ -32,6 +32,10 @@ const seoData: Record<string, SeoData> = {
   '/regex-pattern': {
     title: 'RegEx Patterns',
     description: 'Browse and test regular expressions for filtering and managing your media.',
+  },
+  '/delay-profile': {
+    title: 'Delay Profiles',
+    description: 'Browse delay profiles for controlling release timing and score bypass rules.',
   },
   '/devlogs': {
     title: 'Devlogs',

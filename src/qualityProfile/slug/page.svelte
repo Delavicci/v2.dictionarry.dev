@@ -1,10 +1,10 @@
 <script>
   import Seo from '@shared/ui/seo.svelte';
   import { router } from 'tinro';
-  import { contentDatabase } from '@db';
   import { getSeoData } from '@shared/constants/seoData';
+  import { findEntryByTypeAndSlug, getCurrentDatabaseIdFromPath, getEntrySlugFromPath } from '@shared/utils/contentDatabase';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
   import Overview from './overview/overview.svelte';
   import Scoring from './scoring/scoring.svelte';
   import Qualities from './qualities/qualities.svelte';
@@ -15,13 +15,12 @@
   
   // Get current path and extract slug
   $: currentPath = $router.path;
-  $: slug = currentPath.replace('/quality-profile/', '').replace(/\/$/, '');
+  $: databaseId = getCurrentDatabaseIdFromPath(currentPath);
+  $: slug = getEntrySlugFromPath(currentPath, 'quality-profile');
   
   // Find profile in content database
   $: profileEntry = slug && slug !== 'quality-profile' 
-    ? contentDatabase.entries.find(entry => 
-        entry.type === 'quality-profile' && entry.slug === slug
-      )
+    ? findEntryByTypeAndSlug('quality-profile', slug, databaseId)
     : null;
   
   // Extract all data directly without nesting
@@ -37,7 +36,7 @@
   $: custom_formats_sonarr = profileEntry?.data?.custom_formats_sonarr || [];
   $: qualities = profileEntry?.data?.qualities || [];
   $: upgrade_until = profileEntry?.data?.upgrade_until || null;
-  $: language = profileEntry?.data?.language || null;
+  $: languages = profileEntry?.data?.languages || [];
   $: commitLog = profileEntry?.commitLog || null;
 
   $: seo = {
@@ -47,7 +46,11 @@
   
   // Set up navigation when profile is loaded
   $: if (profileEntry) {
-    const navItems = ['Overview', 'Custom Formats', 'Qualities', 'Changelog', 'Discussion'];
+    const navItems = ['Overview', 'Custom Formats', 'Qualities'];
+    if (commitLog) {
+      navItems.push('Changelog');
+    }
+    navItems.push('Discussion');
     setNavigationItems(navItems, currentPath);
   }
   
@@ -67,7 +70,7 @@
   {#if profileEntry}
     <!-- Overview Section with full-width background -->
     <section id="overview">
-      <Overview {name} {description} {tags} {language} />
+      <Overview {name} {description} {tags} {languages} />
     </section>
     
     <!-- Rest of content with normal padding -->
@@ -83,9 +86,11 @@
       </section>
       
       <!-- Changelog Section -->
-      <section id="changelog" class="mb-12">
-        <Changelog {commitLog} />
-      </section>
+      {#if commitLog}
+        <section id="changelog" class="mb-12">
+          <Changelog {commitLog} />
+        </section>
+      {/if}
       
       <!-- Discussion Section -->
       {#if name}

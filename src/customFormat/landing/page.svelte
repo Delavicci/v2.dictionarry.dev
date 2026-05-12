@@ -4,14 +4,15 @@
   import { getSeoData } from "@shared/constants/seoData";
   import { setNavigationItems, clearNavigation } from "@shared/stores/navigation";
   import { onMount, onDestroy } from "svelte";
-  import { contentDatabase } from "@db";
+  import { getCurrentDatabaseIdFromPath, getEntriesByType } from "@shared/utils/contentDatabase";
   import { Layers, Heart } from "lucide-svelte";
   import MasterList from "./masterList/masterList.svelte";
 
   const seo = getSeoData($router.path);
+  $: databaseId = getCurrentDatabaseIdFromPath($router.path);
   
   // Get total format count
-  $: totalFormats = contentDatabase.entries.filter(e => e.type === 'custom-format').length;
+  $: totalFormats = getEntriesByType('custom-format', databaseId).length;
 
   onMount(() => {
     const navItems = [
@@ -75,7 +76,7 @@
   <!-- Master List Section -->
   <section id="master-list" class="mb-12">
     <h2 class="text-2xl font-bold text-neutral-900 dark:text-white mb-6">Master List</h2>
-    <MasterList />
+    <MasterList {databaseId} />
   </section>
 
   <!-- Credits Section -->

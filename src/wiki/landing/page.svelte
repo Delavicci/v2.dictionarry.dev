@@ -6,11 +6,11 @@
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
   import FeaturedCarousel from './featured/carousel.svelte';
   import WikiList from './list/list.svelte';
-  import { contentDatabase } from '@db';
+  import { getGlobalEntriesByCategory } from '@shared/utils/contentDatabase';
 
   const seo = getSeoData($router.path);
 
-  const wikiEntries = contentDatabase.entries.filter(entry => entry.category === 'wiki');
+  const wikiEntries = getGlobalEntriesByCategory('wiki');
   const featuredEntries = wikiEntries.filter(entry => entry.frontmatter?.featured);
 
   onMount(() => {

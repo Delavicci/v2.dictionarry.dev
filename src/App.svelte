@@ -16,7 +16,10 @@
   import CustomFormatSlug from './customFormat/slug/page.svelte'
   import RegexPatternPage from './regexPattern/landing/page.svelte'
   import RegexPatternSlug from './regexPattern/slug/page.svelte'
+  import DelayProfilePage from './delayProfile/landing/page.svelte'
+  import DelayProfileSlug from './delayProfile/slug/page.svelte'
   import MediaManagementPage from './mediaManagement/mediaManagementPage.svelte'
+  import MediaManagementDetailPage from './mediaManagement/detailPage.svelte'
   import NamingPage from './mediaManagement/namingPage.svelte'
   import QualityDefinitionsPage from './mediaManagement/qualityDefinitionsPage.svelte'
   import MiscSettingsPage from './mediaManagement/miscSettingsPage.svelte'
@@ -39,6 +42,7 @@
     '/quality-profile': QualityProfilePage,
     '/custom-format': CustomFormatPage,
     '/regex-pattern': RegexPatternPage,
+    '/delay-profile': DelayProfilePage,
     '/media-management': MediaManagementPage,
     '/media-management/naming': NamingPage,
     '/media-management/qualitydefinitions': QualityDefinitionsPage,
@@ -50,9 +54,24 @@
   // Dynamic route patterns
   const dynamicRoutes = [
     { pattern: /^\/devlogs\//, component: DevlogsSlug },
+    { pattern: /^\/db\/[^/]+\/quality-profile$/, component: QualityProfilePage },
     { pattern: /^\/quality-profile\//, component: QualityProfileSlug },
+    { pattern: /^\/db\/[^/]+\/quality-profile\//, component: QualityProfileSlug },
+    { pattern: /^\/db\/[^/]+\/custom-format$/, component: CustomFormatPage },
     { pattern: /^\/custom-format\//, component: CustomFormatSlug },
+    { pattern: /^\/db\/[^/]+\/custom-format\//, component: CustomFormatSlug },
+    { pattern: /^\/db\/[^/]+\/regex-pattern$/, component: RegexPatternPage },
     { pattern: /^\/regex-pattern\//, component: RegexPatternSlug },
+    { pattern: /^\/db\/[^/]+\/regex-pattern\//, component: RegexPatternSlug },
+    { pattern: /^\/db\/[^/]+\/delay-profile$/, component: DelayProfilePage },
+    { pattern: /^\/delay-profile\//, component: DelayProfileSlug },
+    { pattern: /^\/db\/[^/]+\/delay-profile\//, component: DelayProfileSlug },
+    { pattern: /^\/db\/[^/]+\/media-management$/, component: MediaManagementPage },
+    { pattern: /^\/db\/[^/]+\/media-management\/naming$/, component: NamingPage },
+    { pattern: /^\/db\/[^/]+\/media-management\/qualitydefinitions$/, component: QualityDefinitionsPage },
+    { pattern: /^\/db\/[^/]+\/media-management\/misc$/, component: MiscSettingsPage },
+    { pattern: /^\/media-management\/[^/]+\/[^/]+$/, component: MediaManagementDetailPage },
+    { pattern: /^\/db\/[^/]+\/media-management\/[^/]+\/[^/]+$/, component: MediaManagementDetailPage },
     { pattern: /^\/wiki\//, component: WikiSlug },
     // Add more dynamic patterns here as needed
   ]

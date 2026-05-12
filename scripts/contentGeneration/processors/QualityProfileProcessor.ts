@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { ContentEntry, RawContent, ProcessorConfig, ContentProcessor } from '../core/types';
 import { DataSource } from '../core/DataSource';
+import { createNamespacedEntryId } from '../core/databaseSource';
 import { slugify, sanitizeForSearch } from '../utils/text';
 
 export class QualityProfileProcessor extends ContentProcessor {
@@ -25,7 +26,9 @@ export class QualityProfileProcessor extends ContentProcessor {
       const searchContent = `${title} ${description} quality profile ${JSON.stringify(data.formatItems || [])}`;
       
       return {
-        id: `quality-profile-${slug}`,
+        id: createNamespacedEntryId(config.database?.id, 'quality-profile', slug),
+        databaseId: config.database?.id,
+        sourceEntityId: data.name || slug,
         path: `/quality-profile/${slug}`,
         type: 'quality-profile',
         slug,
@@ -45,7 +48,7 @@ export class QualityProfileProcessor extends ContentProcessor {
     }
   }
 
-  async processAll(source: DataSource): Promise<ContentEntry[]> {
+  async processAll(source: DataSource, config: ProcessorConfig): Promise<ContentEntry[]> {
     const entries: ContentEntry[] = [];
     const files = await source.listFiles('profiles', /\.ya?ml$/);
     
@@ -55,7 +58,7 @@ export class QualityProfileProcessor extends ContentProcessor {
     for (const file of files) {
       const content = await source.readFile(file);
       if (content) {
-        const entry = await this.process(content, {} as ProcessorConfig);
+        const entry = await this.process(content, config);
         if (entry) {
           // Add commit log if available
           const commitLog = commitLogs.get(file);
@@ -72,14 +75,16 @@ export class QualityProfileProcessor extends ContentProcessor {
 
   // Link custom formats to quality profiles
   async postProcess(entries: ContentEntry[], allEntries: ContentEntry[]): Promise<void> {
-    const customFormatMap = new Map(
-      allEntries
-        .filter(entry => entry.type === 'custom-format')
-        .map(entry => [entry.slug, entry])
-    );
+    const customFormats = allEntries.filter(entry => entry.type === 'custom-format');
 
     for (const entry of entries) {
       if (entry.type === 'quality-profile') {
+        const customFormatMap = new Map(
+          customFormats
+            .filter(format => format.databaseId === entry.databaseId)
+            .map(format => [format.slug, format])
+        );
+
         // Process generic custom_formats field
         if (entry.data?.custom_formats) {
           entry.data.custom_formats = this.enrichCustomFormats(entry.data.custom_formats, customFormatMap);

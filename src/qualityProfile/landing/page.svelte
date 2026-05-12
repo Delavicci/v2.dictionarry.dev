@@ -8,8 +8,10 @@
   import Flowchart from "./flowchart/flowchart.svelte";
   import MasterList from "./masterList/masterList.svelte";
   import { flowchartColumns } from "@shared/constants/flowchartOptions";
+  import { getCurrentDatabaseIdFromPath } from "@shared/utils/contentDatabase";
 
   const seo = getSeoData($router.path);
+  $: databaseId = getCurrentDatabaseIdFromPath($router.path);
 
   // Map selections to profile names
   function getRecommendedProfile(selections) {
@@ -107,7 +109,7 @@
   <div>
     <!-- Master List Section -->
     <section id="master-list">
-      <MasterList />
+      <MasterList {databaseId} />
     </section>
 
     <!-- Profile Wizard Section -->

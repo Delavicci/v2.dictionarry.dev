@@ -1,11 +1,20 @@
 <script>
   import { ArrowUpRight, Hash } from 'lucide-svelte';
+  import { getDefaultDatabaseId } from '@shared/utils/contentDatabase';
   
   export let profile = {};
+
+  function getProfileUrl(profile) {
+    if (profile.databaseId && profile.databaseId !== getDefaultDatabaseId()) {
+      return `/db/${encodeURIComponent(profile.databaseId)}/quality-profile/${profile.slug}`;
+    }
+
+    return `/quality-profile/${profile.slug}`;
+  }
 </script>
 
 <a 
-  href="/quality-profile/{profile.slug}"
+  href={getProfileUrl(profile)}
   class="block p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 
          bg-white dark:bg-neutral-900
          hover:border-blue-500 dark:hover:border-blue-500 

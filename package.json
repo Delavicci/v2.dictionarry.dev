@@ -7,8 +7,10 @@
     "dev": "concurrently -n \"watcher,vite\" -c \"blue,green\" \"tsx scripts/watchMarkdown.ts\" \"vite --host\"",
     "build": "vite build",
     "build:ssg": "vite build && node scripts/prerender.js",
-    "db:dev": "tsx scripts/db.ts --repo https://github.com/Dictionarry-Hub/database --branch dev",
-    "db:stable": "tsx scripts/db.ts --repo https://github.com/Dictionarry-Hub/database --branch stable",
+    "db:v2": "tsx scripts/db.ts --source dictionarry",
+    "db:legacy-yaml": "tsx scripts/db.ts --source dictionarry-dev-yaml",
+    "db:dev": "tsx scripts/db.ts --source dictionarry-dev-yaml",
+    "db:stable": "tsx scripts/db.ts --source dictionarry",
     "db:watch": "tsx scripts/watchMarkdown.ts",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"

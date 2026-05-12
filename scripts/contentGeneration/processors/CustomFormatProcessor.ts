@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { ContentEntry, RawContent, ProcessorConfig, ContentProcessor } from '../core/types';
 import { DataSource } from '../core/DataSource';
+import { createNamespacedEntryId } from '../core/databaseSource';
 import { slugify, sanitizeForSearch } from '../utils/text';
 
 export class CustomFormatProcessor extends ContentProcessor {
@@ -25,7 +26,9 @@ export class CustomFormatProcessor extends ContentProcessor {
       const searchContent = `${title} ${description} custom format ${JSON.stringify(data.specifications || [])}`;
       
       return {
-        id: `custom-format-${slug}`,
+        id: createNamespacedEntryId(config.database?.id, 'custom-format', slug),
+        databaseId: config.database?.id,
+        sourceEntityId: data.name || slug,
         path: `/custom-format/${slug}`,
         type: 'custom-format',
         slug,
@@ -45,7 +48,7 @@ export class CustomFormatProcessor extends ContentProcessor {
     }
   }
 
-  async processAll(source: DataSource): Promise<ContentEntry[]> {
+  async processAll(source: DataSource, config: ProcessorConfig): Promise<ContentEntry[]> {
     const entries: ContentEntry[] = [];
     const files = await source.listFiles('custom_formats', /\.ya?ml$/);
     
@@ -55,7 +58,7 @@ export class CustomFormatProcessor extends ContentProcessor {
     for (const file of files) {
       const content = await source.readFile(file);
       if (content) {
-        const entry = await this.process(content, {} as ProcessorConfig);
+        const entry = await this.process(content, config);
         if (entry) {
           // Add commit log if available
           const commitLog = commitLogs.get(file);
@@ -78,15 +81,23 @@ export class CustomFormatProcessor extends ContentProcessor {
     const formatReferences = new Map<string, Array<{
       title: string;
       slug: string;
+      databaseId?: string;
       score: number;
     }>>();
     
     for (const profile of qualityProfiles) {
-      if (profile.data?.custom_formats) {
-        for (const formatRef of profile.data.custom_formats) {
+      const profileFormatRefs = [
+        ...(profile.data?.custom_formats || []),
+        ...(profile.data?.custom_formats_radarr || []),
+        ...(profile.data?.custom_formats_sonarr || [])
+      ];
+
+      if (profileFormatRefs.length > 0) {
+        for (const formatRef of profileFormatRefs) {
           // Find the custom format entry that matches this format name
           const formatEntry = entries.find(e => 
             e.type === 'custom-format' && 
+            e.databaseId === profile.databaseId &&
             (e.data?.name === formatRef.name || e.title === formatRef.name)
           );
           
@@ -97,6 +108,7 @@ export class CustomFormatProcessor extends ContentProcessor {
             formatReferences.get(formatEntry.id)!.push({
               title: profile.title,
               slug: profile.slug,
+              databaseId: profile.databaseId,
               score: formatRef.score || 0
             });
           }

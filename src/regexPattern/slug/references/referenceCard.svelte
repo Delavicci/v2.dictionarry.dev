@@ -1,11 +1,20 @@
 <script>
   import { ArrowUpRight } from 'lucide-svelte';
+  import { getDefaultDatabaseId } from '@shared/utils/contentDatabase';
   
   export let format = {};
+
+  function getFormatUrl(format) {
+    if (format.databaseId && format.databaseId !== getDefaultDatabaseId()) {
+      return `/db/${encodeURIComponent(format.databaseId)}/custom-format/${format.slug}`;
+    }
+
+    return `/custom-format/${format.slug}`;
+  }
 </script>
 
 <a 
-  href="/custom-format/{format.slug}"
+  href={getFormatUrl(format)}
   class="block p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 
          bg-white dark:bg-neutral-900
          hover:border-blue-500 dark:hover:border-blue-500 

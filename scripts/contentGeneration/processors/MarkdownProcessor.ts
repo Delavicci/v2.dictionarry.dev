@@ -75,7 +75,7 @@ export class MarkdownProcessor extends ContentProcessor {
     }
   }
 
-  async processAll(source: DataSource): Promise<ContentEntry[]> {
+  async processAll(source: DataSource, config?: ProcessorConfig): Promise<ContentEntry[]> {
     const entries: ContentEntry[] = [];
     
     // ALWAYS use local public folder for markdown files, regardless of database source

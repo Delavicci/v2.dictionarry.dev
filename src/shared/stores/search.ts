@@ -1,6 +1,7 @@
 import { writable, derived, get } from 'svelte/store';
 import { filterStore } from './filter';
 import { contentDatabase } from '@db';
+import { getEntryPath } from '@shared/utils/contentDatabase';
 
 // Store for current search term
 export const searchTerm = writable<string>('');
@@ -30,8 +31,9 @@ export const searchResults = derived(
           ($selectedFilters.includes('Wiki Articles') && entry.category === 'wiki') ||
           ($selectedFilters.includes('Custom Formats') && entry.type === 'custom-format') ||
           ($selectedFilters.includes('Quality Profiles') && entry.type === 'quality-profile') ||
-          ($selectedFilters.includes('Development Logs') && entry.category === 'dev-logs') ||
+          ($selectedFilters.includes('Development Logs') && entry.category === 'devlogs') ||
           ($selectedFilters.includes('Regex Patterns') && entry.type === 'regex-pattern') ||
+          ($selectedFilters.includes('Delay Profiles') && entry.type === 'delay-profile') ||
           ($selectedFilters.includes('Media Management') && entry.type === 'media-management');
         
         if (!matchesFilter) return false;
@@ -111,7 +113,7 @@ export const searchResults = derived(
         id: entry.id,
         title: entry.title,
         description: entry.description || '',
-        route: entry.path,
+        route: getEntryPath(entry),
         type: entry.type,
         tags: entry.tags,
         weight: entry.searchWeight

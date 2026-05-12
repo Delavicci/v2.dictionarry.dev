@@ -1,7 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { ContentEntry, ContentDatabase } from './types';
+import { ContentEntry, ContentDatabase, GeneratedDatabaseSource } from './types';
 import { SearchIndexBuilder } from './SearchIndexBuilder';
+import { DEFAULT_DATABASE_ID, DEFAULT_DATABASE_NAME } from './databaseSource';
+
+interface BuildOptions {
+  databases?: GeneratedDatabaseSource[];
+  defaultDatabaseId?: string;
+}
 
 export class DatabaseBuilder {
   private searchIndexBuilder: SearchIndexBuilder;
@@ -10,7 +16,20 @@ export class DatabaseBuilder {
     this.searchIndexBuilder = new SearchIndexBuilder();
   }
   
-  build(entries: ContentEntry[]): ContentDatabase {
+  build(entries: ContentEntry[], options: BuildOptions = {}): ContentDatabase {
+    const databaseIds = [...new Set(entries.map(entry => entry.databaseId).filter(Boolean))] as string[];
+    const defaultDatabaseId = options.defaultDatabaseId || databaseIds[0] || DEFAULT_DATABASE_ID;
+    const inferredDatabaseIds = databaseIds.length > 0 ? databaseIds : [defaultDatabaseId];
+    const databases = options.databases || inferredDatabaseIds.map(id => ({
+      id,
+      name: id === DEFAULT_DATABASE_ID ? DEFAULT_DATABASE_NAME : id,
+      repo: 'unknown',
+      branch: 'unknown',
+      format: 'yaml' as const,
+      isDefault: id === defaultDatabaseId,
+      generatedAt: new Date().toISOString()
+    }));
+
     // Build route map
     const routeMap: Record<string, ContentEntry> = {};
     for (const entry of entries) {
@@ -27,6 +46,8 @@ export class DatabaseBuilder {
     const database: ContentDatabase = {
       entries,
       routeMap,
+      databases,
+      defaultDatabaseId,
       searchIndex,
       categories,
       lastGenerated: new Date().toISOString(),

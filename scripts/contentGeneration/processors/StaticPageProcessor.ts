@@ -1,4 +1,4 @@
-import { ContentEntry, ContentProcessor } from '../core/types';
+import { ContentEntry, ContentProcessor, ProcessorConfig } from '../core/types';
 import { DataSource } from '../core/DataSource';
 import { slugify, sanitizeForSearch } from '../utils/text';
 
@@ -14,7 +14,7 @@ export class StaticPageProcessor extends ContentProcessor {
     return null; // Not used for static pages
   }
 
-  async processAll(source: DataSource): Promise<ContentEntry[]> {
+  async processAll(source: DataSource, config?: ProcessorConfig): Promise<ContentEntry[]> {
     const staticPages = [
       {
         id: 'getting-started-welcome',
@@ -23,14 +23,6 @@ export class StaticPageProcessor extends ContentProcessor {
         description: 'Welcome to Dictionarry - Your media automation configuration hub',
         category: 'getting-started',
         tags: ['welcome', 'home', 'getting-started']
-      },
-      {
-        id: 'getting-started-profilarr',
-        path: '/profilarr-setup',
-        title: 'Profilarr Setup',
-        description: 'Set up and configure Profilarr for automated quality profile management',
-        category: 'getting-started',
-        tags: ['profilarr', 'setup', 'configuration']
       },
       {
         id: 'quality-profile-index',
@@ -55,6 +47,14 @@ export class StaticPageProcessor extends ContentProcessor {
         description: 'Browse and manage regex patterns for advanced matching',
         category: 'regex-pattern',
         tags: ['regex', 'patterns', 'index']
+      },
+      {
+        id: 'delay-profile-index',
+        path: '/delay-profile',
+        title: 'Delay Profiles',
+        description: 'Browse and manage delay profiles for release timing',
+        category: 'delay-profile',
+        tags: ['delay', 'profiles', 'index']
       },
       {
         id: 'media-management-index',

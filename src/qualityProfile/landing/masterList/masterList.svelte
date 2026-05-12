@@ -1,21 +1,22 @@
 <script>
-  import { contentDatabase } from "@db";
   import Table from "@shared/ui/table.svelte";
-  import { router } from "tinro";
+  import { getEntriesByType, getEntryPath } from "@shared/utils/contentDatabase";
   import { parseMarkdown } from "@shared/utils/markdown";
 
+  export let databaseId = undefined;
+
   // Get all quality profiles from the database
-  const qualityProfiles = contentDatabase.entries.filter((entry) => entry.type === "quality-profile");
+  $: qualityProfiles = getEntriesByType("quality-profile", databaseId);
 
   // Transform profiles for table data
-  const profileData = qualityProfiles.map((profile) => {
+  $: profileData = qualityProfiles.map((profile) => {
     // Parse full markdown description to HTML
     const parsedDescription = parseMarkdown(profile.data.description);
 
     return {
       name: profile.data.name,
       description: parsedDescription,
-      url: `/quality-profile/${profile.slug}`,
+      url: getEntryPath(profile, databaseId),
     };
   });
 

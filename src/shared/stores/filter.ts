@@ -16,6 +16,7 @@ export const filterOptions = [
   'Quality Profiles',
   'Development Logs',
   'Regex Patterns',
+  'Delay Profiles',
   'Media Management'
 ];
 

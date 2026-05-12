@@ -2,7 +2,7 @@
   import Seo from '@shared/ui/seo.svelte';
   import { router } from 'tinro';
   import { getSeoData } from '@shared/constants/seoData';
-  import { contentDatabase } from '@db';
+  import { findEntryByTypeAndSlug, getCurrentDatabaseIdFromPath } from '@shared/utils/contentDatabase';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
   import { onMount, onDestroy } from 'svelte';
   import { Film, Tv, FolderOpen, FileText, Hash, Calendar, ToggleLeft } from 'lucide-svelte';
@@ -13,7 +13,8 @@
   const seo = getSeoData($router.path);
 
   // Find the naming entry
-  $: namingEntry = contentDatabase.entries.find(e => e.slug === 'naming' && e.type === 'media-management');
+  $: databaseId = getCurrentDatabaseIdFromPath($router.path);
+  $: namingEntry = findEntryByTypeAndSlug('media-management', 'naming', databaseId);
   $: namingData = namingEntry?.data;
 
   onMount(() => {

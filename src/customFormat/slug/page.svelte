@@ -1,10 +1,10 @@
 <script>
   import Seo from '@shared/ui/seo.svelte';
   import { router } from 'tinro';
-  import { contentDatabase } from '@db';
   import { getSeoData } from '@shared/constants/seoData';
+  import { findEntryByTypeAndSlug, getCurrentDatabaseIdFromPath, getEntrySlugFromPath } from '@shared/utils/contentDatabase';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
   import Overview from './overview/overview.svelte';
   import Conditions from './conditions/conditions.svelte';
   import ProfileReferences from './profileReferences/profileReferences.svelte';
@@ -15,13 +15,12 @@
   
   // Get current path and extract slug
   $: currentPath = $router.path;
-  $: slug = currentPath.replace('/custom-format/', '').replace(/\/$/, '');
+  $: databaseId = getCurrentDatabaseIdFromPath(currentPath);
+  $: slug = getEntrySlugFromPath(currentPath, 'custom-format');
   
   // Find format in content database
   $: formatEntry = slug && slug !== 'custom-format' 
-    ? contentDatabase.entries.find(entry => 
-        entry.type === 'custom-format' && entry.slug === slug
-      )
+    ? findEntryByTypeAndSlug('custom-format', slug, databaseId)
     : null;
   
   // Extract all data directly without nesting
@@ -44,7 +43,10 @@
     if (referencedBy.length > 0) {
       navItems.push('Used In Profiles');
     }
-    navItems.push('Changelog', 'Discussion');
+    if (commitLog) {
+      navItems.push('Changelog');
+    }
+    navItems.push('Discussion');
     setNavigationItems(navItems, currentPath);
   }
   
@@ -71,7 +73,7 @@
     <div >
       <!-- Conditions Section -->
       <section id="conditions" class="mb-12">
-        <Conditions {conditions} />
+        <Conditions {conditions} databaseId={formatEntry.databaseId} />
       </section>
       
       <!-- Used In Profiles Section -->
@@ -82,9 +84,11 @@
       {/if}
       
       <!-- Changelog Section -->
-      <section id="changelog" class="mb-12">
-        <Changelog {commitLog} />
-      </section>
+      {#if commitLog}
+        <section id="changelog" class="mb-12">
+          <Changelog {commitLog} />
+        </section>
+      {/if}
       
       <!-- Discussion Section -->
       {#if name}

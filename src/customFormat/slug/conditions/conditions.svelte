@@ -16,8 +16,10 @@
     AlertCircle,
     Code2
   } from 'lucide-svelte';
+  import { findEntryByTypeAndName, getEntryPath } from '@shared/utils/contentDatabase';
 
   export let conditions = [];
+  export let databaseId = undefined;
 
   // Icon mapping for condition types
   const conditionIcons = {
@@ -90,16 +92,11 @@
     }
   }
 
-  // Create regex pattern URL - find the matching pattern in contentDatabase
-  import { contentDatabase } from '@db';
-  
   function createRegexUrl(regexName) {
     if (!regexName) return null;
     // The pattern field in conditions contains the NAME of the regex pattern entity
-    const regexEntry = contentDatabase.entries.find(entry => 
-      entry.type === 'regex-pattern' && entry.data?.name === regexName
-    );
-    return regexEntry ? regexEntry.path : null;
+    const regexEntry = findEntryByTypeAndName('regex-pattern', regexName, databaseId);
+    return regexEntry ? getEntryPath(regexEntry, databaseId) : null;
   }
 </script>
 

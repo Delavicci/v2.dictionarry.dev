@@ -1,8 +1,8 @@
 <script>
   import Seo from '@shared/ui/seo.svelte';
   import { router } from 'tinro';
-  import { contentDatabase } from '@db';
   import { getSeoData } from '@shared/constants/seoData';
+  import { findGlobalEntry } from '@shared/utils/contentDatabase';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
   import { onDestroy } from 'svelte';
   import Frontmatter from './frontmatter/frontmatter.svelte';
@@ -22,9 +22,7 @@
   
   // Find wiki entry in content database
   $: wikiEntry = slug && slug !== 'wiki' 
-    ? contentDatabase.entries.find(entry => 
-        entry.category === 'wiki' && entry.slug === slug
-      )
+    ? findGlobalEntry('wiki', slug)
     : null;
   
   // Set up navigation when wiki entry is loaded
