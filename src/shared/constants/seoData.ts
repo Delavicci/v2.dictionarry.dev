@@ -21,10 +21,6 @@ const seoData: Record<string, SeoData> = {
     title: 'Installation',
     description: 'A guide to installing Profilarr via Docker, Unraid, or CasaOS.',
   },
-  '/profilarr-setup/101': {
-    title: 'Profilarr 101',
-    description: 'An overview of the core Link, Bridge, and Sync workflow.',
-  },
   '/quality-profile': {
     title: 'Quality Profiles',
     description: 'Browse and discover Quality Profiles for your media server.',

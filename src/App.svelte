@@ -8,7 +8,6 @@
   import HeaderNav from './navigation/headerNav/headerNav.svelte'
   import Welcome from './gettingStarted/welcome.svelte'
   import ProfilarrInstallation from './gettingStarted/profilarrInstallation.svelte'
-  import Profilarr101 from './gettingStarted/101.svelte'
   import DevlogsLanding from './devlogs/landing/page.svelte'
   import DevlogsSlug from './devlogs/slug/page.svelte'
   import QualityProfilePage from './qualityProfile/landing/page.svelte'
@@ -35,7 +34,6 @@
     '/': Welcome,
     '/welcome': Welcome,
     '/profilarr-setup/installation': ProfilarrInstallation,
-    '/profilarr-setup/101': Profilarr101,
     '/devlogs': DevlogsLanding,
     '/quality-profile': QualityProfilePage,
     '/custom-format': CustomFormatPage,

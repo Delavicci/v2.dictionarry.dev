@@ -44,18 +44,11 @@
       color: 'green'
     },
     {
-      title: 'Profilarr 101',
-      description: 'A short overview of linking, bridging, and syncing.',
-      href: '/profilarr-setup/101',
-      icon: WandSparkles,
-      color: 'blue'
-    },
-    {
       title: 'Quality profiles',
       description: 'Browse the profile docs and compare the approaches.',
       href: '/quality-profile',
       icon: WandSparkles,
-      color: 'violet'
+      color: 'blue'
     },
     {
       title: 'Media management',

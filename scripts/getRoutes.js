@@ -9,7 +9,6 @@ export function getAllRoutes() {
   const staticRoutes = [
     '/',
     '/profilarr-setup/installation',
-    '/profilarr-setup/101',
     '/devlogs',
     '/quality-profile',
     '/custom-format',
