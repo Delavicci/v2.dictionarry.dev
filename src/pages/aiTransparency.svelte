@@ -1,5 +1,19 @@
 <script>
+  import { onMount, onDestroy } from 'svelte';
+  import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
   import Seo from '@shared/ui/seo.svelte';
+
+  onMount(() => {
+    setNavigationItems([
+      'How I Use AI',
+      'Accountability & Verification',
+      'Why This Page Exists'
+    ], '/ai-transparency');
+  });
+
+  onDestroy(() => {
+    clearNavigation();
+  });
 </script>
 
 <Seo
@@ -50,7 +64,7 @@
     </p>
   </div>
 
-  <section class="mt-10">
+  <section id="how-i-use-ai" class="mt-10">
     <h2 class="mb-4 text-2xl font-semibold text-neutral-900 dark:text-white">How I Use AI</h2>
 
     <div class="space-y-8 text-neutral-700 dark:text-neutral-300 leading-7">
@@ -86,7 +100,7 @@
     </div>
   </section>
 
-  <section class="mt-10">
+  <section id="accountability-verification" class="mt-10">
     <h2 class="mb-4 text-2xl font-semibold text-neutral-900 dark:text-white">Accountability &amp; Verification</h2>
 
     <div class="space-y-5 text-neutral-700 dark:text-neutral-300 leading-7">
@@ -108,7 +122,7 @@
     </div>
   </section>
 
-  <aside class="mt-10 rounded-r-lg border border-neutral-200 border-l-4 border-l-blue-500 bg-neutral-50 p-4 dark:border-neutral-700 dark:border-l-blue-400 dark:bg-neutral-900/60">
+  <aside id="why-this-page-exists" class="mt-10 rounded-r-lg border border-neutral-200 border-l-4 border-l-blue-500 bg-neutral-50 p-4 dark:border-neutral-700 dark:border-l-blue-400 dark:bg-neutral-900/60">
     <h2 class="mb-3 text-lg font-semibold text-neutral-900 dark:text-white">Why This Page Exists</h2>
     <div class="space-y-4 text-sm leading-6 text-neutral-700 dark:text-neutral-300">
       <p>
