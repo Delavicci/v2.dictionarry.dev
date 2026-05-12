@@ -1,39 +1,110 @@
 <script>
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
-  import { showHoverInfo, hideHoverInfo } from '@shared/stores/hoverInfo';
   import { onMount, onDestroy } from 'svelte';
-  import { WandSparkles, Download, FlaskConical, BookOpen, SlidersHorizontal } from 'lucide-svelte';
+  import { BookOpen, Download, FlaskConical, RefreshCw, Repeat2, SlidersHorizontal, Sliders, TestTube2, WandSparkles } from 'lucide-svelte';
   import Seo from '@shared/ui/seo.svelte';
   import { router } from 'tinro';
   import { getSeoData } from '@shared/constants/seoData';
 
   const seo = getSeoData($router.path);
-  
-  // Define hover definitions for this page
-  const hoverDefinitions = {
-    'custom formats': {
-      term: 'Custom Formats',
-      description: 'Pattern-matching rules that identify specific qualities, codecs, or release characteristics in media file names.'
+
+  const featureCards = [
+    {
+      title: 'Different people want different libraries',
+      icon: Sliders,
+      text: 'Connect databases built around different preferences, then make local tweaks on top instead of pretending one profile set can fit everyone.',
+      color: 'violet'
     },
-    'quality profiles': {
-      term: 'Quality Profiles', 
-      description: 'Collections of custom formats with assigned scores that determine which releases to prefer or reject.'
+    {
+      title: 'Manual Arr setup gets messy',
+      icon: Repeat2,
+      text: 'Sync selected profiles, formats, naming, and quality definitions into Radarr or Sonarr, and keep that setup repeatable.',
+      color: 'blue'
+    },
+    {
+      title: 'Old downloads do not improve themselves',
+      icon: RefreshCw,
+      text: 'Use upgrade filters to work through your existing library over time and ask your Arr to search for better releases.',
+      color: 'green'
+    },
+    {
+      title: "It's hard to know if configs actually work",
+      icon: TestTube2,
+      text: 'Use tests and previews to check regex patterns, custom formats, and profile behavior before syncing changes into your Arrs.',
+      color: 'orange'
     }
+  ];
+
+  const nextSteps = [
+    {
+      title: 'Install Profilarr',
+      description: 'Docker, Unraid, and CasaOS setup notes.',
+      href: '/profilarr-setup/installation',
+      icon: Download,
+      color: 'green'
+    },
+    {
+      title: 'Profilarr 101',
+      description: 'A short overview of linking, bridging, and syncing.',
+      href: '/profilarr-setup/101',
+      icon: WandSparkles,
+      color: 'blue'
+    },
+    {
+      title: 'Quality profiles',
+      description: 'Browse the profile docs and compare the approaches.',
+      href: '/quality-profile',
+      icon: WandSparkles,
+      color: 'violet'
+    },
+    {
+      title: 'Media management',
+      description: 'Naming, quality definitions, and related Arr settings.',
+      href: '/media-management',
+      icon: SlidersHorizontal,
+      color: 'teal'
+    },
+    {
+      title: 'Wiki',
+      description: 'Longer explanations for media automation concepts.',
+      href: '/wiki',
+      icon: BookOpen,
+      color: 'purple'
+    },
+    {
+      title: 'Devlogs',
+      description: 'The more detailed story of what changed and why.',
+      href: '/devlogs',
+      icon: FlaskConical,
+      color: 'orange'
+    }
+  ];
+
+  const borderClasses = {
+    green: 'group-hover:border-green-500 dark:group-hover:border-green-400',
+    blue: 'group-hover:border-blue-500 dark:group-hover:border-blue-400',
+    violet: 'group-hover:border-violet-500 dark:group-hover:border-violet-400',
+    teal: 'group-hover:border-teal-500 dark:group-hover:border-teal-400',
+    purple: 'group-hover:border-purple-500 dark:group-hover:border-purple-400',
+    orange: 'group-hover:border-orange-500 dark:group-hover:border-orange-400'
   };
-  
-  function handleHover(key) {
-    const def = hoverDefinitions[key];
-    if (def) {
-      showHoverInfo(def.term, def.description);
-    }
-  }
-  
+
+  const iconClasses = {
+    green: 'bg-green-100 text-green-600 dark:text-green-400',
+    blue: 'bg-blue-100 text-blue-600 dark:text-blue-400',
+    violet: 'bg-violet-100 text-violet-600 dark:text-violet-400',
+    teal: 'bg-teal-100 text-teal-600 dark:text-teal-400',
+    purple: 'bg-purple-100 text-purple-600 dark:text-purple-400',
+    orange: 'bg-orange-100 text-orange-600 dark:text-orange-400'
+  };
+
   onMount(() => {
     setNavigationItems([
-      { title: 'Motivation', children: ['The Configuration Landscape', 'A Potential Solution', 'The Tooling Challenge', 'Getting Started'] }
+      'Before You Start',
+      'Getting Started'
     ], '/');
   });
-  
+
   onDestroy(() => {
     clearNavigation();
   });
@@ -46,137 +117,66 @@
   url={$router.path}
 />
 
-<div >
-  <h2 id="motivation" class="text-2xl font-semibold text-neutral-900 dark:text-white mb-4">🔥 Motivation</h2>
-
-  <p class="text-neutral-700 dark:text-neutral-300 mb-8">
-    Every media automation setup starts the same way: hours of digging through forum posts and guides, trying to piece together how everything actually works. The result? Hundreds of hours collectively spent solving identical problems.
-  </p>
-
-  <section id="the-configuration-landscape" class="mb-8">
-    <h2 class="text-2xl font-semibold text-neutral-900 dark:text-white mb-4">🌍 The Configuration Landscape</h2>
-    
-    <p class="text-neutral-700 dark:text-neutral-300 mb-4">
-      When someone asks "how do I grab high-quality 4K content?" they're really asking several interconnected questions about codecs, release groups, source types, and quality thresholds. The typical answer involves creating dozens of <span class="hidden lg:inline underline decoration-dotted cursor-help text-blue-600 dark:text-blue-400" on:mouseenter={() => handleHover('custom formats')} on:mouseleave={hideHoverInfo}>custom formats</span><span class="lg:hidden">custom formats</span>, each targeting specific patterns in release names.
-    </p>
-
-    <p class="text-neutral-700 dark:text-neutral-300 mb-4">
-      Custom formats solve individual problems: identifying 4K releases, filtering out low-quality sources, prioritizing certain encoders. But they create a new problem: how do you make 20+ individual rules work together without conflicts? The real challenge lies in orchestrating these tools into coherent <span class="hidden lg:inline underline decoration-dotted cursor-help text-blue-600 dark:text-blue-400" on:mouseenter={() => handleHover('quality profiles')} on:mouseleave={hideHoverInfo}>quality profiles</span><span class="lg:hidden">quality profiles</span> that balance quality, storage, availability, and personal preference. This orchestration knowledge exists, but it's largely implicit, buried in individual setups that took weeks to perfect.
-    </p>
+<div class="max-w-4xl">
+  <section class="mb-10">
+    <h1 class="header-font mb-6 max-w-3xl text-3xl font-semibold leading-tight text-neutral-950 dark:text-white md:text-4xl">
+      Less config wrestling, more watching things.
+    </h1>
+    <div class="space-y-4 text-base leading-7 text-neutral-700 dark:text-neutral-300">
+      <p>
+        Good Arr setups are mostly accumulated knowledge: which groups are worth trusting, which releases should be avoided, how scores interact, which regex catches the thing you meant without catching five things you did not. Profilarr exists so that knowledge can be maintained by people who enjoy building it, shared as databases, and reused by everyone else. It achieves this by focusing on these four practical problems.
+      </p>
+    </div>
   </section>
 
-  <section id="a-potential-solution" class="mb-8">
-    <h2 class="text-2xl font-semibold text-neutral-900 dark:text-white mb-4">💡 A Potential Solution</h2>
-    
-    <p class="text-neutral-700 dark:text-neutral-300 mb-4">
-      Instead of everyone rebuilding the same configurations from scratch, what if we shared complete, battle-tested profiles? Each one designed around a specific approach to media collection:
-    </p>
-
-    <ul class="list-disc list-inside space-y-2 mb-6 text-neutral-700 dark:text-neutral-300">
-      <li class="text-neutral-700 dark:text-neutral-300">
-        <strong class="text-blue-500 underline hover:text-blue-600"><a href='quality-profile/2160p-remux'>2160p Remux</a></strong> - Archival approach prioritizing perfect source preservation with lossless audio and HDR/Dolby Vision
-      </li>
-      <li class="text-neutral-700 dark:text-neutral-300">
-        <strong class="text-blue-500 underline hover:text-blue-600"><a href='quality-profile/2160p-quality'>2160p Quality</a></strong> - Perceptual transparency via efficiency metrics, accepting high-quality encodes that are visually identical to source
-      </li>
-      <li class="text-neutral-700 dark:text-neutral-300">
-        <strong class="text-blue-500 underline hover:text-blue-600"><a href='quality-profile/1080p-quality'>1080p Quality</a></strong> - Performance-indexed selection using Golden Popcorn metrics for transparent results
-      </li>
-      <li class="text-neutral-700 dark:text-neutral-300">
-        <strong class="text-blue-500 underline hover:text-blue-600"><a href='quality-profile/1080p-compact'>1080p Compact</a></strong> - Space-conscious x265 optimization based on encode efficiency calculations
-      </li>
-      <li class="text-neutral-700 dark:text-neutral-300">
-        <strong class="text-blue-500 underline hover:text-blue-600"><a href='quality-profile'>And More</a></strong> - Additional profiles for specific use cases and requirements
-      </li>
-    </ul>
+  <section id="what-profilarr-does" class="mb-10">
+    <div class="grid gap-4 md:grid-cols-2">
+      {#each featureCards as card}
+        <article class="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
+          <div class="mb-3 flex items-center gap-3">
+            <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md {iconClasses[card.color]} dark:bg-neutral-800">
+              <svelte:component this={card.icon} class="h-5 w-5" />
+            </span>
+            <h3 class="font-semibold text-neutral-900 dark:text-white">{card.title}</h3>
+          </div>
+          <p class="text-sm leading-6 text-neutral-600 dark:text-neutral-400">{card.text}</p>
+        </article>
+      {/each}
+    </div>
   </section>
 
-  <section id="the-tooling-challenge" class="mb-8">
-    <h2 class="text-2xl font-semibold text-neutral-900 dark:text-white mb-4">🔧 The Tooling Challenge</h2>
-    <p class="text-neutral-700 dark:text-neutral-300 mb-4">
-      Even with perfect configuration databases, a critical gap remains: how do you actually apply these configurations to your setup? How do you handle updates without losing your customizations? How do you track what changed and why? For developers, without proper tooling, you're stuck with no version control and manual API interactions.
-    </p>
-    <p class="text-neutral-700 dark:text-neutral-300 mb-4">
-      Profilarr solves all these problems. It's a management tool that sits between configuration databases and your Radarr/Sonarr installations, automatically pulling updates, converting formats, and syncing everything while preserving your local changes. For developers, it provides a proper workflow with version control, easy testing, and seamless sharing.
-    </p>
-    <p class="text-neutral-700 dark:text-neutral-300 mb-4">
-      The process is simple:
-    </p>
-    <ul class="list-disc list-inside space-y-2 mb-4 text-neutral-700 dark:text-neutral-300">
-      <li>You link a configuration database</li>
-      <li>You connect your Radarr/Sonarr instances</li>
-      <li>You press sync</li>
-    </ul>
-    <p class="text-neutral-700 dark:text-neutral-300 mb-4">
-      Behind the scenes, Profilarr:
-    </p>
-    <ul class="list-disc list-inside space-y-2 mb-6 text-neutral-700 dark:text-neutral-300">
-      <li>Automatically compiles configurations for different arr formats</li>
-      <li>Preserves your local modifications</li>
-      <li>Pulls in new updates from the database</li>
-      <li>Handles merge conflicts transparently</li>
-      <li>Tracks every change with version control</li>
-    </ul>
+  <section id="before-you-start" class="mb-10 rounded-r-lg border border-neutral-200 border-l-4 border-l-amber-500 bg-neutral-50 p-4 dark:border-neutral-700 dark:border-l-amber-500 dark:bg-neutral-900/60">
+    <div class="mb-2 flex items-center gap-2">
+      <span>⚠️</span>
+      <h2 class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">Before You Start</h2>
+    </div>
+    <div class="space-y-3 text-sm leading-6 text-neutral-700 dark:text-neutral-200">
+      <p>
+        Profilarr v2 replaces v1, but it is not an upgrade you can apply to an existing v1 setup. The app has changed enough that there is no migration path, so start with a fresh install instead of reusing old appdata or configuration.
+      </p>
+      <p>
+        If you are still using v1, use the v1 docs linked <a href="https://v1.dictionarry.dev" class="text-blue-600 hover:underline dark:text-blue-400">here</a>.
+      </p>
+    </div>
   </section>
 
   <section id="getting-started" class="mb-8">
-    <h2 class="text-2xl font-semibold text-neutral-900 dark:text-white mb-6">🚀 Getting Started</h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <!-- Installation Card -->
-      <a href="/profilarr-setup/installation" class="group block p-6 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-green-500 dark:hover:border-green-400 transition-all duration-200 hover:shadow-lg">
-        <div class="flex items-center mb-3">
-          <div class="w-10 h-10 bg-green-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3">
-            <Download class="w-6 h-6 text-green-600 dark:text-green-400" />
+    <h2 class="mb-4 text-2xl font-semibold text-neutral-900 dark:text-white">🚀 Getting Started</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      {#each nextSteps as step}
+        <a
+          href={step.href}
+          class="group block rounded-lg border border-neutral-200 bg-white p-5 transition-colors hover:bg-neutral-50 {borderClasses[step.color]} dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800/70"
+        >
+          <div class="mb-3 flex items-center gap-3">
+            <span class="flex h-9 w-9 items-center justify-center rounded-md {iconClasses[step.color]} dark:bg-neutral-800">
+              <svelte:component this={step.icon} class="h-5 w-5" />
+            </span>
+            <h3 class="font-semibold text-neutral-900 dark:text-white">{step.title}</h3>
           </div>
-          <h3 class="text-lg font-semibold text-neutral-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400">Installation</h3>
-        </div>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">Step-by-step guide to set up Profilarr in your environment</p>
-      </a>
-
-      <!-- Profile Wizard Card -->
-      <a href="/quality-profile?section=profile-wizard" class="group block p-6 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:shadow-lg">
-        <div class="flex items-center mb-3">
-          <div class="w-10 h-10 bg-blue-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3">
-            <WandSparkles class="w-6 h-6 text-blue-600 dark:text-blue-400" />
-          </div>
-          <h3 class="text-lg font-semibold text-neutral-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">Profile Wizard</h3>
-        </div>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">Get recommended quality profiles based on your preferences and setup</p>
-      </a>
-
-      <!-- Devlog Card -->
-      <a href="/devlogs" class="group block p-6 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-orange-500 dark:hover:border-orange-400 transition-all duration-200 hover:shadow-lg">
-        <div class="flex items-center mb-3">
-          <div class="w-10 h-10 bg-orange-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3">
-            <FlaskConical class="w-6 h-6 text-orange-600 dark:text-orange-400" />
-          </div>
-          <h3 class="text-lg font-semibold text-neutral-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400">Dev Log</h3>
-        </div>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">Follow the development journey and latest updates</p>
-      </a>
-
-      <!-- Wiki Card -->
-      <a href="/wiki" class="group block p-6 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-purple-500 dark:hover:border-purple-400 transition-all duration-200 hover:shadow-lg">
-        <div class="flex items-center mb-3">
-          <div class="w-10 h-10 bg-purple-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3">
-            <BookOpen class="w-6 h-6 text-purple-600 dark:text-purple-400" />
-          </div>
-          <h3 class="text-lg font-semibold text-neutral-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">Wiki</h3>
-        </div>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">Deep dives into media automation concepts and best practices</p>
-      </a>
-
-      <!-- Media Management Card -->
-      <a href="/media-management" class="group block p-6 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:border-teal-500 dark:hover:border-teal-400 transition-all duration-200 hover:shadow-lg">
-        <div class="flex items-center mb-3">
-          <div class="w-10 h-10 bg-teal-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3">
-            <SlidersHorizontal class="w-6 h-6 text-teal-600 dark:text-teal-400" />
-          </div>
-          <h3 class="text-lg font-semibold text-neutral-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400">Media Management</h3>
-        </div>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">Configure naming, quality definitions, and misc settings</p>
-      </a>
+          <p class="text-sm leading-6 text-neutral-600 dark:text-neutral-400">{step.description}</p>
+        </a>
+      {/each}
     </div>
   </section>
 </div>
