@@ -2,6 +2,7 @@ import { writable, derived, get } from 'svelte/store';
 import { filterStore } from './filter';
 import { contentDatabase } from '@db';
 import { getEntryPath } from '@shared/utils/contentDatabase';
+import { selectedDatabaseId } from './database';
 
 // Store for current search term
 export const searchTerm = writable<string>('');
@@ -15,8 +16,8 @@ export { filterOptions as searchFilters } from './filter';
 
 // Derived store for filtered search results
 export const searchResults = derived(
-  [searchTerm, selectedFilters],
-  ([$searchTerm, $selectedFilters]) => {
+  [searchTerm, selectedFilters, selectedDatabaseId],
+  ([$searchTerm, $selectedFilters, $selectedDatabaseId]) => {
     if (!$searchTerm.trim()) {
       return [];
     }
@@ -26,6 +27,8 @@ export const searchResults = derived(
     // Map content database entries to search results
     return contentDatabase.entries
       .filter(entry => {
+        if (entry.databaseId && entry.databaseId !== $selectedDatabaseId) return false;
+
         // Filter by type - matches if "All Types" is selected OR if specific type is selected
         const matchesFilter = $selectedFilters.includes('All Types') ||
           ($selectedFilters.includes('Wiki Articles') && entry.category === 'wiki') ||
@@ -113,7 +116,7 @@ export const searchResults = derived(
         id: entry.id,
         title: entry.title,
         description: entry.description || '',
-        route: getEntryPath(entry),
+        route: getEntryPath(entry, $selectedDatabaseId),
         type: entry.type,
         tags: entry.tags,
         weight: entry.searchWeight

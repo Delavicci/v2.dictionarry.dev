@@ -4,11 +4,12 @@
   import { getSeoData } from '@shared/constants/seoData';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
   import { onDestroy } from 'svelte';
-  import { findEntryByTypeAndSlug, getCurrentDatabaseIdFromPath, getEntrySlugFromPath } from '@shared/utils/contentDatabase';
+  import { findEntryByTypeAndSlug, getEntrySlugFromPath } from '@shared/utils/contentDatabase';
+  import { selectedDatabaseId } from '@shared/stores/database';
   import { Clock, Gauge, Timer, CheckCircle, XCircle } from 'lucide-svelte';
 
   $: currentPath = $router.path;
-  $: databaseId = getCurrentDatabaseIdFromPath(currentPath);
+  $: databaseId = $selectedDatabaseId;
   $: slug = getEntrySlugFromPath(currentPath, 'delay-profile');
   $: profileEntry = slug && slug !== 'delay-profile'
     ? findEntryByTypeAndSlug('delay-profile', slug, databaseId)

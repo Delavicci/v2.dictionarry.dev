@@ -2,16 +2,18 @@
   import ThemeToggle from '@ui/themeToggle.svelte';
   import Dropdown from '@ui/dropdown.svelte';
   import DropdownRow from '@ui/dropdownRow.svelte';
+  import DatabasePicker from './databasePicker.svelte';
   import { siGithub, siDiscord, siBuymeacoffee } from 'simple-icons';
   import { MoreHorizontal, GitBranch } from 'lucide-svelte';
   import { clickOutside } from '@shared/utils/clickOutside.js';
   import { contentDatabase } from '@db';
+  import { selectedDatabase } from '@shared/stores/database';
   
   let isDropdownOpen = false;
   
   // Format database metadata for display
   $: dbInfo = (() => {
-    if (!contentDatabase.metadata) return null;
+    if (!contentDatabase.metadata || !$selectedDatabase) return null;
     
     const meta = contentDatabase.metadata;
     const date = new Date(meta.timestamp);
@@ -21,22 +23,25 @@
       year: 'numeric'
     });
     
-    const source = meta.source === 'local' ? 'Local' : meta.source.split('/').pop() || meta.source;
+    const source = $selectedDatabase.repo === 'local'
+      ? 'Local'
+      : $selectedDatabase.repo.split('/').pop() || $selectedDatabase.repo;
     
     // Build GitHub URL if it's from a repository
     let repoUrl = null;
-    if (meta.source !== 'local' && meta.source.includes('github.com')) {
-      repoUrl = `${meta.source}/tree/${meta.branch}`;
-    } else if (meta.source !== 'local') {
+    if ($selectedDatabase.repo !== 'local' && $selectedDatabase.repo.includes('github.com')) {
+      repoUrl = `${$selectedDatabase.repo}/tree/${$selectedDatabase.branch}`;
+    } else if ($selectedDatabase.repo !== 'local') {
       // Assume it's a GitHub repo shorthand like "user/repo"
-      repoUrl = `https://github.com/${meta.source}/tree/${meta.branch}`;
+      repoUrl = `https://github.com/${$selectedDatabase.repo}/tree/${$selectedDatabase.branch}`;
     }
     
     return {
+      name: $selectedDatabase.name,
       source,
-      branch: meta.branch,
+      branch: $selectedDatabase.branch,
       date: formattedDate,
-      entries: meta.entriesCount,
+      entries: contentDatabase.entries.filter((entry) => entry.databaseId === $selectedDatabase.id).length,
       url: repoUrl
     };
   })();
@@ -83,6 +88,9 @@
         <div class="text-xs space-y-1">
           <div class="font-semibold text-neutral-900 dark:text-neutral-100 mb-2">Database Info</div>
           <div class="text-neutral-600 dark:text-neutral-400">
+            <span class="font-medium">Name:</span> {dbInfo.name}
+          </div>
+          <div class="text-neutral-600 dark:text-neutral-400">
             <span class="font-medium">Source:</span> {dbInfo.source}
           </div>
           <div class="text-neutral-600 dark:text-neutral-400">
@@ -97,7 +105,7 @@
           {#if dbInfo.url}
             <div class="pt-2 mt-2 border-t border-neutral-200 dark:border-neutral-700">
               <a href={dbInfo.url} target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">
-                View on GitHub →
+                View on GitHub
               </a>
             </div>
           {/if}
@@ -105,6 +113,8 @@
       </div>
     </div>
   {/if}
+
+  <DatabasePicker />
 </div>
 
 <!-- Mobile view -->
@@ -131,6 +141,7 @@
         <div class="flex flex-col gap-1 flex-1">
           <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Database</span>
           <div class="text-xs text-neutral-500 dark:text-neutral-400 space-y-0.5">
+            <div>{dbInfo.name}</div>
             <div>{dbInfo.source} • {dbInfo.branch}</div>
             <div>{dbInfo.date} • {dbInfo.entries} entries</div>
           </div>
@@ -138,6 +149,11 @@
         <GitBranch class="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
       </DropdownRow>
     {/if}
+
+    <DropdownRow>
+      <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Source</span>
+      <DatabasePicker />
+    </DropdownRow>
     
     <!-- Appearance row -->
     <DropdownRow>

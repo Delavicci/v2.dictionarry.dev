@@ -4,12 +4,13 @@
   import { getSeoData } from "@shared/constants/seoData";
   import { setNavigationItems, clearNavigation } from "@shared/stores/navigation";
   import { onMount, onDestroy } from "svelte";
-  import { getCurrentDatabaseIdFromPath, getEntriesByType } from "@shared/utils/contentDatabase";
+  import { getEntriesByType } from "@shared/utils/contentDatabase";
+  import { selectedDatabaseId } from "@shared/stores/database";
   import { Layers, Heart } from "lucide-svelte";
   import MasterList from "./masterList/masterList.svelte";
 
   const seo = getSeoData($router.path);
-  $: databaseId = getCurrentDatabaseIdFromPath($router.path);
+  $: databaseId = $selectedDatabaseId;
   
   // Get total format count
   $: totalFormats = getEntriesByType('custom-format', databaseId).length;

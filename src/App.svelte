@@ -29,6 +29,7 @@
   import NotFound from './pages/404/404.svelte'
   import { theme } from '@shared/stores/theme'
   import { loadSearchIndex } from '@shared/stores/search'
+  import { selectedDatabaseId } from '@shared/stores/database'
   import { onMount } from 'svelte'
   import { isMobileSidebarOpen, closeMobileSidebar, isMobileHeaderNavOpen, closeMobileHeaderNav } from '@shared/stores/mobileNavigation'
   import { fly } from 'svelte/transition'
@@ -108,6 +109,7 @@
   // Normalize URLs to remove trailing slashes
   router.subscribe((route) => {
     const path = window.location.pathname
+    selectedDatabaseId.syncFromPath(path)
     if (path.length > 1 && path.endsWith('/')) {
       const normalizedPath = path.slice(0, -1)
       const search = window.location.search

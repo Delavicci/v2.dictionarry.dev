@@ -1,15 +1,13 @@
 <script>
   import SidebarSection from './pageNavSection.svelte';
   import SidebarItem from './pageNavItem.svelte';
-  import { getCurrentDatabaseIdFromPath, getDatabasePath, getDatabases, getEntriesByType, getEntryPath, getGlobalEntriesByCategory, stripDatabasePrefix } from '@shared/utils/contentDatabase';
+  import { getDatabasePath, getEntriesByType, getEntryPath, getGlobalEntriesByCategory } from '@shared/utils/contentDatabase';
+  import { selectedDatabaseId } from '@shared/stores/database';
   import { router } from 'tinro';
   
   // Get current path for active state
   $: currentPath = $router.path;
-  $: databaseId = getCurrentDatabaseIdFromPath(currentPath);
-  $: databases = getDatabases();
-  $: cleanPath = stripDatabasePrefix(currentPath);
-  $: isDatabaseRoute = /^\/(quality-profile|custom-format|regex-pattern|delay-profile|media-management)(\/|$)/.test(cleanPath);
+  $: databaseId = $selectedDatabaseId;
   
   // Filter entries by category/type at build time
   const devLogEntries = getGlobalEntriesByCategory('devlogs')
@@ -53,22 +51,6 @@
       <SidebarItem href="/profilarr-setup/installation" label="Installation" isActive={currentPath === "/profilarr-setup/installation"} />
     </SidebarSection>
 
-    {#if databases.length > 1 && isDatabaseRoute}
-      <div class="px-3 py-3 mb-2 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-900">
-        <label for="database-select" class="block text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2">Database</label>
-        <select
-          id="database-select"
-          value={databaseId}
-          on:change={(event) => router.goto(getDatabasePath(cleanPath, event.currentTarget.value))}
-          class="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-1.5 text-sm text-neutral-800 dark:text-neutral-100"
-        >
-          {#each databases as database}
-            <option value={database.id}>{database.name}</option>
-          {/each}
-        </select>
-      </div>
-    {/if}
-  
     <!-- Quality Profiles Section -->
     <SidebarSection title="⚡ Quality Profiles" href={getDatabasePath('/quality-profile', databaseId)} isActive={currentPath === getDatabasePath('/quality-profile', databaseId)} isOpen={false}>
       {#each qualityProfileEntries as entry}

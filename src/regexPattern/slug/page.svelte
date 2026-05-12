@@ -2,7 +2,8 @@
   import Seo from '@shared/ui/seo.svelte';
   import { router } from 'tinro';
   import { getSeoData } from '@shared/constants/seoData';
-  import { findEntryByTypeAndSlug, getCurrentDatabaseIdFromPath, getEntrySlugFromPath } from '@shared/utils/contentDatabase';
+  import { findEntryByTypeAndSlug, getEntrySlugFromPath } from '@shared/utils/contentDatabase';
+  import { selectedDatabaseId } from '@shared/stores/database';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
   import { onDestroy } from 'svelte';
   import Overview from './overview/overview.svelte';
@@ -16,7 +17,7 @@
   
   // Get current path and extract slug
   $: currentPath = $router.path;
-  $: databaseId = getCurrentDatabaseIdFromPath(currentPath);
+  $: databaseId = $selectedDatabaseId;
   $: slug = getEntrySlugFromPath(currentPath, 'regex-pattern');
   
   // Find regex pattern in content database

@@ -4,13 +4,14 @@
   import { getSeoData } from '@shared/constants/seoData';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
   import { onDestroy } from 'svelte';
-  import { findEntryByTypeAndSlug, getCurrentDatabaseIdFromPath, stripDatabasePrefix } from '@shared/utils/contentDatabase';
+  import { findEntryByTypeAndSlug, stripDatabasePrefix } from '@shared/utils/contentDatabase';
+  import { selectedDatabaseId } from '@shared/stores/database';
   import { Film, Tv, FolderOpen, FileText, Hash, Calendar, ToggleLeft } from 'lucide-svelte';
   import CodeBlock from '@shared/ui/codeBlock.svelte';
   import Table from '@shared/ui/table.svelte';
 
   $: currentPath = $router.path;
-  $: databaseId = getCurrentDatabaseIdFromPath(currentPath);
+  $: databaseId = $selectedDatabaseId;
   $: cleanPath = stripDatabasePrefix(currentPath).replace(/\/$/, '');
   $: slug = cleanPath.split('/').pop();
   $: mediaEntry = slug ? findEntryByTypeAndSlug('media-management', slug, databaseId) : null;

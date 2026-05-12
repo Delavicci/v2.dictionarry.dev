@@ -8,10 +8,10 @@
   import Flowchart from "./flowchart/flowchart.svelte";
   import MasterList from "./masterList/masterList.svelte";
   import { flowchartColumns } from "@shared/constants/flowchartOptions";
-  import { getCurrentDatabaseIdFromPath } from "@shared/utils/contentDatabase";
+  import { selectedDatabaseId } from "@shared/stores/database";
 
   const seo = getSeoData($router.path);
-  $: databaseId = getCurrentDatabaseIdFromPath($router.path);
+  $: databaseId = $selectedDatabaseId;
 
   // Map selections to profile names
   function getRecommendedProfile(selections) {

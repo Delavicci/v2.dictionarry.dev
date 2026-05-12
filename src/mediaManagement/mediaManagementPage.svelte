@@ -4,12 +4,13 @@
   import { getSeoData } from '@shared/constants/seoData';
   import { onMount, onDestroy } from 'svelte';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
-  import { getCurrentDatabaseIdFromPath, getEntriesByType, getEntryPath } from '@shared/utils/contentDatabase';
+  import { getEntriesByType, getEntryPath } from '@shared/utils/contentDatabase';
+  import { selectedDatabaseId } from '@shared/stores/database';
   import { FileText, BarChart3, Settings } from 'lucide-svelte';
 
   const seo = getSeoData('/media-management');
 
-  $: databaseId = getCurrentDatabaseIdFromPath($router.path);
+  $: databaseId = $selectedDatabaseId;
   $: mediaManagementEntries = getEntriesByType('media-management', databaseId)
     .sort((a, b) => a.title.localeCompare(b.title));
 

@@ -4,12 +4,13 @@
   import { getSeoData } from '@shared/constants/seoData';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
   import { onMount, onDestroy } from 'svelte';
-  import { getCurrentDatabaseIdFromPath, getEntriesByType, getEntryPath } from '@shared/utils/contentDatabase';
+  import { getEntriesByType, getEntryPath } from '@shared/utils/contentDatabase';
+  import { selectedDatabaseId } from '@shared/stores/database';
   import { Clock, Timer, Gauge } from 'lucide-svelte';
 
   const seo = getSeoData('/delay-profile');
 
-  $: databaseId = getCurrentDatabaseIdFromPath($router.path);
+  $: databaseId = $selectedDatabaseId;
   $: delayProfiles = getEntriesByType('delay-profile', databaseId)
     .sort((a, b) => a.title.localeCompare(b.title));
 

@@ -1,6 +1,8 @@
 <script>
   import { Volume2, Monitor, Users, Tv, Code, HardDrive, Tag, Square, Layers, Folder, ChevronDown, ChevronRight, Film, Tv as TvIcon } from 'lucide-svelte';
   import { slide } from 'svelte/transition';
+  import { getDatabasePath } from '@shared/utils/contentDatabase';
+  import { selectedDatabaseId } from '@shared/stores/database';
   
   export let groupName = '';
   export let formats = [];
@@ -28,6 +30,11 @@
   
   function toggleExpanded() {
     isExpanded = !isExpanded;
+  }
+
+  function formatPath(format) {
+    const slug = format.slug || format.name.toLowerCase().replace(/\s+/g, '-');
+    return getDatabasePath(`/custom-format/${slug}`, $selectedDatabaseId);
   }
 </script>
 
@@ -65,7 +72,7 @@
             <tr class="border-b border-neutral-100 dark:border-neutral-800 last:border-b-0 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-colors cursor-pointer group">
               <td class="p-0">
                 <a 
-                  href="/custom-format/{format.slug || format.name.toLowerCase().replace(/\s+/g, '-')}"
+                  href={formatPath(format)}
                   class="block px-4 py-3 text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:underline transition-colors"
                 >
                   {format.name}
@@ -97,7 +104,7 @@
               </td>
               <td class="px-4 py-3 text-right">
                 <a 
-                  href="/custom-format/{format.slug || format.name.toLowerCase().replace(/\s+/g, '-')}"
+                  href={formatPath(format)}
                   class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium transition-all {format.score > 0 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 group-hover:bg-green-200 dark:group-hover:bg-green-900/50' : format.score < 0 ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 group-hover:bg-red-200 dark:group-hover:bg-red-900/50' : 'bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-400 group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700'}"
                 >
                   {format.score > 0 ? '+' : ''}{format.score}

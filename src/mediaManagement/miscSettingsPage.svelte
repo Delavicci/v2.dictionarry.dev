@@ -2,7 +2,8 @@
   import Seo from "@shared/ui/seo.svelte";
   import { router } from "tinro";
   import { getSeoData } from "@shared/constants/seoData";
-  import { findEntryByTypeAndSlug, getCurrentDatabaseIdFromPath } from "@shared/utils/contentDatabase";
+  import { findEntryByTypeAndSlug } from "@shared/utils/contentDatabase";
+  import { selectedDatabaseId } from "@shared/stores/database";
   import { setNavigationItems, clearNavigation } from "@shared/stores/navigation";
   import { onMount, onDestroy } from "svelte";
   import { Film, Tv, ToggleLeft } from "lucide-svelte";
@@ -15,7 +16,7 @@
   };
 
   // Find the misc settings entry
-  $: databaseId = getCurrentDatabaseIdFromPath($router.path);
+  $: databaseId = $selectedDatabaseId;
   $: miscEntry = findEntryByTypeAndSlug("media-management", "misc", databaseId);
   $: miscData = miscEntry?.data;
 

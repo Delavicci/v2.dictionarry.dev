@@ -2,7 +2,8 @@
   import Seo from '@shared/ui/seo.svelte';
   import { router } from 'tinro';
   import { getSeoData } from '@shared/constants/seoData';
-  import { findEntryByTypeAndSlug, getCurrentDatabaseIdFromPath } from '@shared/utils/contentDatabase';
+  import { findEntryByTypeAndSlug } from '@shared/utils/contentDatabase';
+  import { selectedDatabaseId } from '@shared/stores/database';
   import { setNavigationItems, clearNavigation } from '@shared/stores/navigation';
   import { onMount, onDestroy } from 'svelte';
   import { Film, Tv } from 'lucide-svelte';
@@ -13,7 +14,7 @@
   const seo = getSeoData($router.path);
 
   // Find the quality definitions entry
-  $: databaseId = getCurrentDatabaseIdFromPath($router.path);
+  $: databaseId = $selectedDatabaseId;
   $: qualityDefinitionsEntry = findEntryByTypeAndSlug('media-management', 'qualitydefinitions', databaseId);
   $: qualityDefinitionsData = qualityDefinitionsEntry?.data;
 
