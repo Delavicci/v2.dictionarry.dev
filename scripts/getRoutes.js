@@ -17,7 +17,8 @@ export function getAllRoutes() {
     '/media-management/naming',
     '/media-management/qualitydefinitions',
     '/media-management/misc',
-    '/wiki'
+    '/wiki',
+    '/ai-transparency'
   ];
 
   // Get dynamic routes from the generated content database

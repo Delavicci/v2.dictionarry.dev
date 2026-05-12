@@ -22,6 +22,7 @@
   import MiscSettingsPage from './mediaManagement/miscSettingsPage.svelte'
   import WikiPage from './wiki/landing/page.svelte'
   import WikiSlug from './wiki/slug/page.svelte'
+  import AiTransparency from './pages/aiTransparency.svelte'
   import NotFound from './pages/404/404.svelte'
   import { theme } from '@shared/stores/theme'
   import { loadSearchIndex } from '@shared/stores/search'
@@ -43,6 +44,7 @@
     '/media-management/qualitydefinitions': QualityDefinitionsPage,
     '/media-management/misc': MiscSettingsPage,
     '/wiki': WikiPage,
+    '/ai-transparency': AiTransparency,
   }
   
   // Dynamic route patterns

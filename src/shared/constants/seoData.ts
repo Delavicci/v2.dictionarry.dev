@@ -57,6 +57,10 @@ const seoData: Record<string, SeoData> = {
     title: 'Quality Definitions',
     description: 'Set file size limits for different video qualities like 720p, 1080p, and 4K in Radarr and Sonarr.',
   },
+  '/ai-transparency': {
+    title: 'AI Transparency',
+    description: 'How AI is used during Profilarr development, and why accountability matters more than purity.',
+  },
 };
 
 export function getSeoData(path: string): SeoData {
