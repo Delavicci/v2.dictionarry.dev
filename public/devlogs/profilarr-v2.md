@@ -1,0 +1,100 @@
+---
+title: Profilarr v2 is Out!
+slug: profilarr-v2
+blurb: profilarr 2 - electric boogaloo
+author: santiagosayshey
+created: 2026-05-23
+tags:
+  - profilarr v2
+  - release
+  - milestone
+  - databases
+  - upgrades
+---
+
+For those unfamiliar, Profilarr syncs quality profiles, custom formats, and media management settings from shared configuration databases into your arr instances. 
+
+v2 has been in closed beta for a few months and is now publicly available! Here's a preview:
+
+![Profilarr v2 Preview](/images/devlog_profilarr_v2_preview.png[style=dark])
+![Profilarr v2 Preview](/images/devlog_profilarr_v2_preview.png[style=light])
+
+# What's New?
+
+## Multiple databases
+
+v2 can connect to multiple databases at the same time. A few of the more popular ones:
+
+- **[Dictionarry](https://github.com/Dictionarry-Hub/database)**: the one we work on, connected by default. Covers 720p through 2160p, from compact x265 encodes to UHD remuxes.
+- **[TRaSH PCD](https://github.com/Dictionarry-Hub/trash-pcd)**: a port of the TRaSH guides into PCD format.
+- **[Dumpstarr](https://github.com/Dumpstarr/Database)**: a community fork built on Dictionarry and TRaSH formats.
+- **[PCD template](https://github.com/Dictionarry-Hub/database-template)**: a starting point if none of those fit and you want to build your own.
+
+## Upgrades
+
+The Arrs are great at reacting to new releases via RSS, but they don't continuously revisit older downloads looking for something better. This is especially important when you switch or update quality profiles and are left with releases that no longer match what the new profile would have grabbed.
+
+[Upgradinatorr](https://github.com/angrycuban13/Just-A-Bunch-Of-Starr-Scripts/blob/main/Upgradinatorr/README.md) solved this by cycling through your library and triggering searches over time. v2 brings that idea into Profilarr, with more control and a GUI.
+
+You can filter by any metadata your Arr tracks: ratings, year, genre, size, release group, language, date added, and more. Filters support nested AND/OR logic, selectors let you prioritise what gets searched first, cooldowns prevent items from being repeatedly searched, and everything can run on a schedule.
+
+## Customisations
+
+v1 handled local changes through complex git-based three-way merges. v2 replaces that with a dedicated change layer: your local changes now live separately from the upstream database, which means updates can come in without overwriting your changes or forcing you through messy merge conflicts. In practice, that means fewer conflicts surface in the first place, and the ones that do can often be resolved automatically.
+
+## Small Things
+
+In addition to those major highlights, here are some smaller improvements:
+- A new UI with light/dark theming that doesn't look terrible on mobile.
+- In-app onboarding that walks you through everything instead of dumping you into the docs.
+- Library pages for both Radarr and Sonarr, with:
+    - Table and card views, both with configurable display fields.
+    - Smart filters with AND logic, negation, and range queries across fields like quality, profile, year, genre, status, monitored, etc.
+    - Filtering by which custom formats do/don't apply.
+    - Sorting by custom format score.
+- In-app announcements from the Profilarr team and database maintainers, so you don't need to live on Discord/Reddit/wherever to keep up.
+- Notifications for jobs (database updates, config syncs, drift, upgrades, renames, and more), sent via Discord, Telegram, Ntfy, or generic webhooks. Each service can subscribe to its own set of event types.
+- Drift detection: scheduled per-Arr checks that flag when your custom formats, quality profiles, delay profile, or media management settings no longer match what Profilarr would sync.
+- Rename automation inspired by [Renameinatorr](https://github.com/Drazzilb08/daps/blob/master/modules/renameinatorr.py).
+- Cleanup automation inspired by [Health Checkarr](https://github.com/Drazzilb08/daps/blob/master/modules/health_checkarr.py).
+- Overhauled testing:
+    - Regex101 links can be attached to patterns and parsed for test cases.
+    - A parser microservice that bundles Sonarr/Radarr's parse logic, enabling custom format testing.
+    - A quality profile simulator that lets you store interactive searches and test them against all your profiles at once.
+- Media Management configs are no longer one-per-instance, so you can have multiple quality definitions, naming schemes, and media settings.
+- Delay Profiles are now their own config type.
+- More auth options: OIDC support, plus the ability to disable auth entirely if you're running your own reverse proxy.
+- A native [TRaSH guides database](https://github.com/Dictionarry-Hub/trash-pcd) in PCD format.
+    - Note: This is maintained by the dictionarry team, not the TRaSH team and therefore not "official". If something is wrong/inaccurate, please let us know first!
+    - Small additions to the PCD spec (include-in-rename, per-condition arr types, and a few others) were added to help match the original TRaSH configs.
+
+
+# Notes
+
+**v2 is not compatible with v1**. The underlying database and customisation systems changed significantly, so existing v1 databases/configs/appdata won't work directly in v2.
+
+If you want to try v2:
+
+- Our [documentation](https://dictionarry.dev/) covers installation and initial setup. From there, the in-app onboarding guides you through the rest
+- Please post bugs, feedback, and feature requests to the [issue tracker](https://github.com/Dictionarry-Hub/profilarr/issues)
+- If you need help or support, you can find us on [Discord](https://discord.gg/XGdTJP5G8a)
+- You can also follow development progress on the [website](https://dictionarry.dev/)
+- If you're curious about how AI is and isn't used within the project, here's a short [write-up](https://v2.dictionarry.dev/ai-transparency)
+
+# Thank You!
+
+A few years ago I just wanted to share some quality profiles I thought people might be interested in. It's gotten a little out of hand since then... None of that is possible without: 
+- Those of you who use Profilarr. Who decided some random open-source thing from a stranger on the internet was worth giving a go.
+- Our beta testers who willingly tested v2 on their production setups :D
+- Our support team: Ba11in0nABudget, delavicci, and SFusion, for being the best support team on the planet.
+- Seraphys, who has taken over maintaining the database and made it better than I could ever dream of. Also for being a pain in my ass. 
+
+# What's Next?
+
+You can follow the `2.x.x` roadmap [here](https://github.com/Dictionarry-Hub/profilarr/milestone/2). Some highlights from that include:
+- The ability to import regex/custom formats/quality profiles without connecting a whole database first
+- Advanced profile automation to make certain media use specific profiles according to properties
+	- This helps to enable a workflow where you might want to download something at a higher quality first to watch, then downgrade for archival purposes.
+- A theming overhaul that uses semantic CSS inspired by qui's terrific [theming system](https://github.com/autobrr/qui)
+- More API endpoints to enable external integrations. Some parts of this have already been completed and can be used in small integrations like dashboards!
+- If you would like to follow development a bit closer, I write [dev logs](https://v2.dictionarry.dev/devlogs)!
