@@ -74,10 +74,12 @@ In addition to those major highlights, here are some smaller improvements:
 If you want to try v2:
 
 - Our [documentation](https://dictionarry.dev/) covers installation and initial setup. From there, the in-app onboarding guides you through the rest
+- Unraid users: the v2 template is currently pending Community Applications approval. It should appear in the Apps tab within a couple of days. In the meantime, the Docker Compose setup in the [README](https://github.com/Dictionarry-Hub/profilarr#-getting-started) works fine.
 - Please post bugs, feedback, and feature requests to the [issue tracker](https://github.com/Dictionarry-Hub/profilarr/issues)
-- If you need help or support, you can find us on [Discord](https://discord.gg/XGdTJP5G8a)
+- If you need help or support, you can find us on [Discord](https://discord.gg/XGdTJP5G8a) and [r/Profilarr](https://www.reddit.com/r/Profilarr/)
 - You can also follow development progress on the [website](https://dictionarry.dev/)
 - If you're curious about how AI is and isn't used within the project, here's a short [write-up](https://v2.dictionarry.dev/ai-transparency)
+
 
 # Thank You!
 
@@ -95,4 +97,10 @@ You can follow the `2.x.x` roadmap [here](https://github.com/Dictionarry-Hub/pro
 	- This helps to enable a workflow where you might want to download something at a higher quality first to watch, then downgrade for archival purposes.
 - A theming overhaul that uses semantic CSS inspired by qui's terrific [theming system](https://github.com/autobrr/qui)
 - More API endpoints to enable external integrations. Some parts of this have already been completed and can be used in small integrations like dashboards!
-- If you would like to follow development a bit closer, I write [dev logs](https://v2.dictionarry.dev/devlogs)!
+
+## Anime
+
+For those wondering about anime, there is no profile yet, but it's on the roadmap. The approach is a bit different from our existing profiles: instead of one profile that scores releases across your whole library, we're building per-series profiles based on manual rankings of the best release in each variety for each anime; similar to what [SeaDex](https://releases.moe/) does, but across more formats (Blu-ray encode, WEB, Remux, dual audio, subs, etc.). This ties into the advanced profile automation work above; per-series profiles only work if each anime can be routed to its own profile automatically.
+
+In the meantime, v2's multi-database support means you can run Dictionarry alongside any community-built anime database. Progress [here](https://github.com/Dictionarry-Hub/database/issues/56).
+
