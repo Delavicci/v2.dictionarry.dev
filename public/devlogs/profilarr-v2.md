@@ -3,7 +3,7 @@ title: Profilarr v2 is Out!
 slug: profilarr-v2
 blurb: profilarr 2 - electric boogaloo
 author: santiagosayshey
-created: 2026-05-23
+created: 2026-05-17
 tags:
   - profilarr v2
   - release
@@ -26,7 +26,7 @@ v2 has been in closed beta for a few months and is now publicly available! Here'
 v2 can connect to multiple databases at the same time. A few of the more popular ones:
 
 - **[Dictionarry](https://github.com/Dictionarry-Hub/database)**: the one we work on, connected by default. Covers 720p through 2160p, from compact x265 encodes to UHD remuxes.
-- **[TRaSH PCD](https://github.com/Dictionarry-Hub/trash-pcd)**: a port of the TRaSH guides into PCD format.
+- **[TRaSH PCD](https://github.com/Dictionarry-Hub/trash-pcd)**: a port of the TRaSH guides in PCD format. Note that this is maintained by the Dictionarry team, not TRaSH. It's mirrored from upstream as-is, so if our copy ever falls behind or doesn't match, please report any issues here first so we can sort it out, rather than bothering the TRaSH team about it. French and German profiles are still in progress.
 - **[Dumpstarr](https://github.com/Dumpstarr/Database)**: a community fork built on Dictionarry and TRaSH formats.
 - **[PCD template](https://github.com/Dictionarry-Hub/database-template)**: a starting point if none of those fit and you want to build your own.
 
@@ -64,9 +64,7 @@ In addition to those major highlights, here are some smaller improvements:
 - Media Management configs are no longer one-per-instance, so you can have multiple quality definitions, naming schemes, and media settings.
 - Delay Profiles are now their own config type.
 - More auth options: OIDC support, plus the ability to disable auth entirely if you're running your own reverse proxy.
-- A native [TRaSH guides database](https://github.com/Dictionarry-Hub/trash-pcd) in PCD format.
-    - Note: This is maintained by the dictionarry team, not the TRaSH team and therefore not "official". If something is wrong/inaccurate, please let us know first!
-    - Small additions to the PCD spec (include-in-rename, per-condition arr types, and a few others) were added to help match the original TRaSH configs.
+- Small additions to the PCD spec (include-in-rename, per-condition arr types, and a few others) to help match the original TRaSH configs.
 
 
 # Notes
