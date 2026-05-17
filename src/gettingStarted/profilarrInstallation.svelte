@@ -111,8 +111,11 @@
 
   <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mt-8 mb-4" id="unraid">Unraid</h2>
   <p class="text-neutral-700 dark:text-neutral-300 mt-6">
-    The easiest way to install Profilarr on Unraid is through the <strong>Community Applications</strong> plugin. Simply
-    search for "Profilarr" and install the container.
+      The easiest way to install Profilarr on Unraid is through the <strong>Community Applications</strong> plugin. Simply
+      search for "Profilarr" and install the container.
+  </p>
+  <p class="text-sm text-amber-700 dark:text-amber-400 mt-2">
+      Note: the v2 template is currently pending Community Applications approval and should appear within a couple of days. Until then, use the Docker Compose setup above.
   </p>
 
   <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mt-8 mb-4" id="thats-it">That's It</h2>
