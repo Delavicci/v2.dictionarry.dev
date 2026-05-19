@@ -22,7 +22,7 @@
   url="/ai-transparency"
 />
 
-<article class="max-w-3xl">
+<article class="max-w-4xl">
   <h1 class="mb-6 text-3xl font-semibold text-neutral-950 dark:text-white">AI Transparency</h1>
 
   <div class="space-y-5 text-neutral-700 dark:text-neutral-300 leading-7">
