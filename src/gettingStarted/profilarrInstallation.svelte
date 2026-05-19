@@ -11,7 +11,7 @@
   const seo = getSeoData($router.path);
 
   onMount(() => {
-    setNavigationItems(["Overview", "Versions", "Docker", "Parser", "Unraid", "That's It"], "/profilarr-setup/installation");
+    setNavigationItems(["Overview", "Versions", "Docker", "Parser", "Reverse Proxy", "Authentication", "Unraid", "That's It"], "/profilarr-setup/installation");
   });
 
   onDestroy(() => {
@@ -71,6 +71,13 @@
       icon: Terminal,
     },
   ];
+
+  const originCode = `- ORIGIN=https://profilarr.your.domain`;
+
+  const oidcCode = `- AUTH=oidc
+- OIDC_DISCOVERY_URL=https://your-provider/.well-known/openid-configuration
+- OIDC_CLIENT_ID=your-client-id
+- OIDC_CLIENT_SECRET=your-client-secret`;
 </script>
 
 <Seo title={seo.title} description={seo.description} image={seo.image} url={$router.path} />
@@ -109,13 +116,43 @@
     It is optional. Linking databases, syncing their configs, and running upgrades all work without it. It's primarily for database developers to test their configs. If you do not need testing, remove the <code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">parser</code> service, the <code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">PARSER_HOST</code>/<code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">PARSER_PORT</code> environment variables, and the <code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">depends_on</code> block.
   </p>
 
+  <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mt-8 mb-4" id="reverse-proxy">Reverse Proxy</h2>
+  <p class="text-neutral-700 dark:text-neutral-300 mt-6">
+    If you are running Profilarr behind a reverse proxy (Traefik, Nginx Proxy Manager, Caddy, etc.), set the <code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">ORIGIN</code> environment variable to the public URL Profilarr will be served from. Without it, Profilarr will not function correctly.
+  </p>
+  <p class="text-neutral-700 dark:text-neutral-300 mt-4">
+    Add the following to the <code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">environment</code> block of the <code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">profilarr</code> service:
+  </p>
+
+  <div class="mt-4">
+    <CodeBlock items={[{ title: "Environment", code: originCode, language: "yaml" }]} />
+  </div>
+
+  <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mt-8 mb-4" id="authentication">Authentication</h2>
+  <p class="text-neutral-700 dark:text-neutral-300 mt-6">
+    Profilarr supports three authentication modes, selected via the <code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">AUTH</code> environment variable:
+  </p>
+  <ul class="text-neutral-700 dark:text-neutral-300 mt-4 ml-6 list-disc space-y-1">
+    <li><code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">on</code> — default, local username/password login required</li>
+    <li><code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">off</code> — no authentication (not recommended, use at your own risk)</li>
+    <li><code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">oidc</code> — single sign-on via an external identity provider</li>
+  </ul>
+  <p class="text-neutral-700 dark:text-neutral-300 mt-4">
+    For OIDC, set <code class="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">AUTH=oidc</code> along with the discovery URL, client ID, and client secret from your identity provider (Authentik, Authelia, Keycloak, etc.):
+  </p>
+
+  <div class="mt-4">
+    <CodeBlock items={[{ title: "Environment", code: oidcCode, language: "yaml" }]} />
+  </div>
+
+
   <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mt-8 mb-4" id="unraid">Unraid</h2>
   <p class="text-neutral-700 dark:text-neutral-300 mt-6">
       The easiest way to install Profilarr on Unraid is through the <strong>Community Applications</strong> plugin. Simply
       search for "Profilarr" and install the container.
   </p>
   <p class="text-sm text-amber-700 dark:text-amber-400 mt-2">
-      Note: the v2 template is currently pending Community Applications approval and should appear within a couple of days. Until then, use the Docker Compose setup above.
+      Note: the v2 template is separate from the one used for v1. The old template has been removed completely from Community Applications.
   </p>
 
   <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mt-8 mb-4" id="thats-it">That's It</h2>
